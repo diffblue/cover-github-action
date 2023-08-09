@@ -14,3 +14,8 @@ updates:
     directory: /test
     schedule:
       interval: daily
+
+  - package-ecosystem: gradle
+    directory: /test
+    schedule:
+      interval: daily
