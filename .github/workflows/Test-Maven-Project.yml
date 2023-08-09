@@ -1,0 +1,40 @@
+name: "Test: Maven Project"
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - 'releases/*'
+
+jobs:
+
+  Test:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+        matrix:
+            os: [ubuntu-latest, windows-latest, macos-latest]
+
+    defaults:
+      run:
+        working-directory: ./test/maven-project
+        
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          java-version: '8'
+          distribution: 'zulu'
+
+      - name: Diffblue Cover
+        uses: ./
+        with:
+          milliseconds: 1000
+
+      - name: Maven Install
+        run: mvn --batch-mode install
