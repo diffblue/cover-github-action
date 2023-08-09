@@ -31,10 +31,10 @@ jobs:
           java-version: '8'
           distribution: 'zulu'
 
+      - name: Maven Install
+        run: mvn --batch-mode install
+  
       - name: Diffblue Cover
         uses: ./
         with:
           milliseconds: 1000
-
-      - name: Maven Install
-        run: mvn --batch-mode install
