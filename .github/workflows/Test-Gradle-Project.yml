@@ -1,4 +1,4 @@
-name: "Test: Maven Project"
+name: "Test: Gradle Project"
 
 on:
   pull_request:
@@ -18,7 +18,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: ./test/maven-project
+        working-directory: ./test/gradle-project
         
     steps:
 
@@ -31,9 +31,9 @@ jobs:
           java-version: '8'
           distribution: 'zulu'
 
-      - name: Maven Install
-        run: mvn --batch-mode install
-  
+      - name: Gradle Build
+        run: ./gradlew --console plain build
+
       - name: Diffblue Cover
         uses: ./
         with:
