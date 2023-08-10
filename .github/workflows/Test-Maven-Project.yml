@@ -31,8 +31,8 @@ jobs:
           java-version: '8'
           distribution: 'zulu'
 
-      - name: Maven Install
-        run: mvn --batch-mode install
+      - name: Autobuild
+        uses: codeql-action/autobuild@v2.14.1
   
       - name: Diffblue Cover
         uses: ./

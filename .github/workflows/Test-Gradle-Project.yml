@@ -31,8 +31,8 @@ jobs:
           java-version: '8'
           distribution: 'zulu'
 
-      - name: Gradle Build
-        run: ./gradlew --console plain build
+      - name: Autobuild
+        uses: codeql-action/autobuild@v2.14.1
 
       - name: Diffblue Cover
         uses: ./
