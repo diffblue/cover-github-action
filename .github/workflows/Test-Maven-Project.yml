@@ -32,7 +32,7 @@ jobs:
           distribution: 'zulu'
 
       - name: Autobuild
-        uses: codeql-action/autobuild@v2.14.1
+        uses: github/codeql-action/autobuild@v2
   
       - name: Diffblue Cover
         uses: ./
