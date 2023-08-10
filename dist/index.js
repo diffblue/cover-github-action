@@ -185,6 +185,8 @@ function run() {
             core.startGroup('Install Diffblue Cover');
             yield (0, install_latest_version_1.installLatestVersion)();
             yield exec.exec('dcover', ['--version']);
+            const key = core.getInput('license-key');
+            yield exec.exec('dcover', ['activate', key]);
             core.endGroup();
         }
         catch (error) {
