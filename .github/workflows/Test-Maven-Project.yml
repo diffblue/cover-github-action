@@ -37,4 +37,4 @@ jobs:
       - name: Diffblue Cover
         uses: ./
         with:
-          milliseconds: 1000
+          license-key: ${{ secrets.DIFFBLUE_LICENSE_KEY }}
