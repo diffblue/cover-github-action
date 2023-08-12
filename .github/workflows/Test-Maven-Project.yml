@@ -36,5 +36,8 @@ jobs:
   
       - name: Diffblue Cover
         uses: ./
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
         with:
           license-key: ${{ secrets.DIFFBLUE_LICENSE_KEY }}
+          topic-id-differentiator: ${{ matrix.os }}

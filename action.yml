@@ -5,6 +5,9 @@ inputs:
   license-key:
     required: true
     description: The license key provided in your welcome email or provided by your organization
+  topic-id-differentiator:
+    required: false
+    description: Optional string to differentiate multiple uses of the actions within a single workflow.
 runs:
   using: node16
   main: dist/index.js

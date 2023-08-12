@@ -2,11 +2,13 @@ import * as core from '@actions/core'
 import * as exec from '@actions/exec'
 import {installLatestVersion} from './install-latest-version'
 import {uploadLogs} from './upload-logs'
+import {readStatus, saveStatus} from './status-io'
 
 async function run(): Promise<void> {
+  const status = await readStatus()
   try {
     core.startGroup('Install Diffblue Cover')
-    await installLatestVersion()
+    await installLatestVersion(status)
     await exec.exec('dcover', ['--version'])
 
     const keyName = 'license-key'
@@ -24,10 +26,13 @@ async function run(): Promise<void> {
 
     core.endGroup()
   } catch (error) {
-    if (error instanceof Error) core.setFailed(error.message)
+    if (error instanceof Error) {
+      core.setFailed(error.message)
+    }
   }
 
-  uploadLogs()
+  await uploadLogs()
+  await saveStatus(status)
 }
 
 run()
