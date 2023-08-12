@@ -1,7 +1,7 @@
 import * as core from '@actions/core'
 import * as exec from '@actions/exec'
-
 import {installLatestVersion} from './install-latest-version'
+import {uploadLogs} from './upload-logs'
 
 async function run(): Promise<void> {
   try {
@@ -16,6 +16,8 @@ async function run(): Promise<void> {
   } catch (error) {
     if (error instanceof Error) core.setFailed(error.message)
   }
+
+  uploadLogs()
 }
 
 run()
