@@ -1,9 +1,8 @@
 import * as core from '@actions/core'
-import {readFileSync} from 'fs'
+import * as github from '@actions/github'
 
 declare let process: {
   env: {
-    GITHUB_EVENT_PATH: string
     GITHUB_REPOSITORY: string
     GITHUB_JOB: string
     GITHUB_WORKFLOW: string
@@ -69,9 +68,8 @@ export class Status {
     this.run_link_title = `${this.workflow} / ${this.job} ${differentiator}`
     this.run_link_url = `${process.env.GITHUB_SERVER_URL}/${owner}/${repo}/actions/runs/${process.env.GITHUB_RUN_ID}/attempts/${process.env.GITHUB_RUN_ATTEMPT}`
 
-    const event = readEventDetails()
-    this.sha = event.sha
-    this.issue_number = event.issue_number
+    this.sha = github.context.payload.pull_request?.head?.sha || ''
+    this.issue_number = github.context.payload.pull_request?.number || 0
   }
 
   /**
@@ -108,34 +106,5 @@ export class Status {
     } else {
       return [`- Version: ${this.version} :heavy_check_mark:`]
     }
-  }
-}
-
-/** The interesting summary details of the event JSON */
-class EventDetails {
-  sha = ''
-  issue_number = 0
-}
-
-/** Read the `GITHUB_EVENT_PATH` JSON and summarise the
- * @returns the summary details of the event.
- */
-function readEventDetails(): EventDetails {
-  class EventDetailsCommit {
-    sha = ''
-  }
-  class EventDetailsPullRequest {
-    number = 0
-    head = {} as EventDetailsCommit
-  }
-  class Event {
-    pull_request = {} as EventDetailsPullRequest
-  }
-  const event = JSON.parse(
-    readFileSync(process.env.GITHUB_EVENT_PATH, 'utf8')
-  ) as Event
-  return {
-    sha: event.pull_request.head.sha,
-    issue_number: event.pull_request.number
   }
 }
