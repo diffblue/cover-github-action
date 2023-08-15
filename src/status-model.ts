@@ -98,7 +98,7 @@ export class Status {
       `<!-- Topic: ${this.topic_slug} -->`,
       `### Diffblue Cover`,
       ``,
-      `- Run: [${this.run_link_title} :runner:](${this.run_link_url})`,
+      `- Run: [${this.run_link_title}](${this.run_link_url})`,
       `- Commit: ${this.sha}`
     ]
   }
