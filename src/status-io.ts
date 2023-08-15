@@ -30,7 +30,6 @@ export async function saveStatus(status: Status): Promise<void> {
 
   const octokit = new Octokit()
   await createOrUpdateComment(octokit, status)
-  await hidePreviousComments(octokit, status)
 }
 
 /**
@@ -62,6 +61,7 @@ async function createOrUpdateComment(
       flag: 'w'
     })
     core.debug(`Created Comment: ${response.data.html_url}`)
+    await hidePreviousComments(octokit, status)
   }
 }
 
