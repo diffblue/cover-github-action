@@ -14,14 +14,32 @@ const markdownFile = `${dir}/status.md`
 const jsonFile = `${dir}/status.json`
 
 /**
+ * Reads the previous Status or returns a fresh Status to begin work.
+ * The status is always marked as work-in-progress, and the comment is updated to match.
  * @returns the previously stored status, or else a fresly created one.
  */
 export async function readStatus(): Promise<Status> {
+  let status: Status
   try {
-    return JSON.parse(readFileSync(jsonFile, 'utf8')) as Status
+    status = JSON.parse(readFileSync(jsonFile, 'utf8')) as Status
   } catch (error) {
-    return new Status()
+    status = new Status()
   }
+
+  try {
+    status.work_in_progress = true
+    const octokit = new Octokit()
+    await createOrUpdateComment(octokit, status)
+  } catch (error) {
+    if (error instanceof Error) {
+      core.setFailed(error.message)
+      if (error.stack) {
+        core.error(error.stack)
+      }
+    }
+  }
+
+  return status
 }
 
 /**

@@ -13,6 +13,9 @@ declare let process: {
 }
 
 export class Status {
+  /** `true` iff the status is being actively worked on */
+  work_in_progress = true
+
   /** The GitHub repository owner */
   owner: string
 
@@ -82,7 +85,8 @@ export class Status {
     return [
       ...this.#markdownHeaderLines(),
       ...this.#markdownVersionLines(),
-      ...this.#markdownErrorLines()
+      ...this.#markdownErrorLines(),
+      ...this.#markdownWorkInProgressLines()
     ].join('\n')
   }
 
@@ -120,6 +124,20 @@ export class Status {
       return [`- Error: \`${this.error.message}\` :exclamation:`]
     } else if (this.error) {
       return [`- Error: \`${this.error}\` :exclamation:`]
+    } else {
+      return []
+    }
+  }
+
+  /**
+   * @returns lines of markdown content showing work in progress information
+   */
+  #markdownWorkInProgressLines(): string[] {
+    if (this.work_in_progress) {
+      return [
+        ``,
+        `:construction: _This comment is under construction and will be updated on completion._ :construction: `
+      ]
     } else {
       return []
     }

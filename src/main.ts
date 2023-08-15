@@ -41,6 +41,7 @@ async function run(): Promise<void> {
   }
 
   await upload(status)
+  status.work_in_progress = false
   await saveStatus(status)
 }
 
