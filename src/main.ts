@@ -31,7 +31,7 @@ async function run(): Promise<void> {
     }
   }
 
-  await upload()
+  await upload(status)
   await saveStatus(status)
 }
 
