@@ -11,7 +11,7 @@ name: Example Workflow
 on:
   pull_request:
 jobs:
-  Test:
+  Test Job:
     runs-on: ubuntu-latest
     steps:
       - name: Diffblue Cover
@@ -21,6 +21,10 @@ jobs:
         with:
           license-key: ${{ secrets.DIFFBLUE_LICENSE_KEY }}
 ```
+
+An artifact e.g. `diffblue-cover-action-example-workflow-test-job.zip` containing Diffblue Cover related logs and reports will be uploaded to GitHub for each run will be uploaded to GitHub.
+These artifacts can be downloaded from the bottom of the GitHub Actions workflow summary page, and will be essential when requesting support.
+See https://www.diffblue.com/support/ to access support.
 
 ## Development
 
