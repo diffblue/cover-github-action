@@ -186,8 +186,16 @@ function run() {
             core.startGroup('Install Diffblue Cover');
             yield (0, install_latest_version_1.installLatestVersion)();
             yield exec.exec('dcover', ['--version']);
-            const key = core.getInput('license-key');
-            yield exec.exec('dcover', ['activate', key]);
+            const keyName = 'license-key';
+            const keyValue = core.getInput(keyName);
+            if (keyValue === '') {
+                throw new Error([
+                    `Missing '${keyName}' configuration:`,
+                    `Please ensure that the action has a '${keyName}' configured, typically using a GitHub secret.`,
+                    `Please ensure that all users pushing to the repository has access to the necessary secret.`
+                ].join('\n'));
+            }
+            yield exec.exec('dcover', ['activate', keyValue]);
             core.endGroup();
         }
         catch (error) {
