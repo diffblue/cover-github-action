@@ -22,6 +22,8 @@ jobs:
           license-key: ${{ secrets.DIFFBLUE_LICENSE_KEY }}
 ```
 
+The action only supports `pull_request` events, and will do nothing for if run under other events.
+
 An artifact e.g. `diffblue-cover-action-example-workflow-test-job.zip` containing Diffblue Cover related logs and reports will be uploaded to GitHub for each run will be uploaded to GitHub.
 These artifacts can be downloaded from the bottom of the GitHub Actions workflow summary page, and will be essential when requesting support.
 See https://www.diffblue.com/support/ to access support.
