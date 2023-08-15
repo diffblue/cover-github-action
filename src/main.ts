@@ -31,6 +31,7 @@ async function run(): Promise<void> {
 
     core.endGroup()
   } catch (error) {
+    status.error = error
     if (error instanceof Error) {
       core.setFailed(error.message)
       if (error.stack) {

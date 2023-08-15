@@ -46,6 +46,9 @@ export class Status {
   /** The Diffblue Cover version, or error associated with it's discovery, if known */
   version?: string | Error
 
+  /** Any error associated with the overall status. */
+  error?: unknown
+
   constructor() {
     const [owner, repo] = process.env.GITHUB_REPOSITORY.split('/')
     this.owner = owner
@@ -78,7 +81,8 @@ export class Status {
   markdown(): string {
     return [
       ...this.#markdownHeaderLines(),
-      ...this.#markdownVersionLines()
+      ...this.#markdownVersionLines(),
+      ...this.#markdownErrorLines()
     ].join('\n')
   }
 
@@ -105,6 +109,19 @@ export class Status {
       return [`- Version: ${this.version.message} :exclamation:`]
     } else {
       return [`- Version: ${this.version} :heavy_check_mark:`]
+    }
+  }
+
+  /**
+   * @returns lines of markdown content showing error information
+   */
+  #markdownErrorLines(): string[] {
+    if (this.error instanceof Error) {
+      return [`- Error: \`${this.error.message}\` :exclamation:`]
+    } else if (this.error) {
+      return [`- Error: \`${this.error}\` :exclamation:`]
+    } else {
+      return []
     }
   }
 }
