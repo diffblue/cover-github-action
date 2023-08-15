@@ -1,5 +1,6 @@
 import * as core from '@actions/core'
 import * as exec from '@actions/exec'
+import * as github from '@actions/github'
 import {installLatestVersion} from './install-latest-version'
 import {upload} from './upload'
 import {readStatus, saveStatus} from './status-io'
@@ -7,6 +8,12 @@ import {readStatus, saveStatus} from './status-io'
 async function run(): Promise<void> {
   const status = await readStatus()
   try {
+    // Debug section temporarily added to understand build failures on merge
+    core.startGroup('Debug')
+    core.info(`ENV: ${JSON.stringify(process.env, undefined, '  ')}`)
+    core.info(`EVENT: ${JSON.stringify(github.context, undefined, '  ')}`)
+    core.endGroup()
+
     core.startGroup('Install Diffblue Cover')
     await installLatestVersion(status)
     await exec.exec('dcover', ['--version'])
@@ -28,6 +35,9 @@ async function run(): Promise<void> {
   } catch (error) {
     if (error instanceof Error) {
       core.setFailed(error.message)
+      if (error.stack) {
+        core.error(error.stack)
+      }
     }
   }
 
