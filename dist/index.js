@@ -180,11 +180,15 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(2186));
 const exec = __importStar(__nccwpck_require__(1514));
 const github = __importStar(__nccwpck_require__(5438));
+const skip = __importStar(__nccwpck_require__(8830));
 const install_latest_version_1 = __nccwpck_require__(994);
 const upload_1 = __nccwpck_require__(4831);
 const status_io_1 = __nccwpck_require__(2199);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
+        if (skip.skipEventType()) {
+            return;
+        }
         const status = yield (0, status_io_1.readStatus)();
         try {
             // Debug section temporarily added to understand build failures on merge
@@ -220,6 +224,54 @@ function run() {
     });
 }
 run();
+
+
+/***/ }),
+
+/***/ 8830:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.skipEventType = void 0;
+const core = __importStar(__nccwpck_require__(2186));
+const github = __importStar(__nccwpck_require__(5438));
+/**
+ * @returns `true` iff the action should be skipped due to the event type.
+ */
+function skipEventType() {
+    const eventName = github.context.eventName;
+    const skip = eventName !== 'pull_request';
+    if (skip) {
+        core.info(`Skipping event type: ${eventName}`);
+    }
+    return skip;
+}
+exports.skipEventType = skipEventType;
 
 
 /***/ }),
