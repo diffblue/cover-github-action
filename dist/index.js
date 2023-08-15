@@ -179,6 +179,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(2186));
 const exec = __importStar(__nccwpck_require__(1514));
+const github = __importStar(__nccwpck_require__(5438));
 const install_latest_version_1 = __nccwpck_require__(994);
 const upload_1 = __nccwpck_require__(4831);
 const status_io_1 = __nccwpck_require__(2199);
@@ -186,6 +187,11 @@ function run() {
     return __awaiter(this, void 0, void 0, function* () {
         const status = yield (0, status_io_1.readStatus)();
         try {
+            // Debug section temporarily added to understand build failures on merge
+            core.startGroup('Debug');
+            core.info(`ENV: ${JSON.stringify(process.env, undefined, '  ')}`);
+            core.info(`EVENT: ${JSON.stringify(github.context, undefined, '  ')}`);
+            core.endGroup();
             core.startGroup('Install Diffblue Cover');
             yield (0, install_latest_version_1.installLatestVersion)(status);
             yield exec.exec('dcover', ['--version']);
@@ -204,6 +210,9 @@ function run() {
         catch (error) {
             if (error instanceof Error) {
                 core.setFailed(error.message);
+                if (error.stack) {
+                    core.error(error.stack);
+                }
             }
         }
         yield (0, upload_1.upload)(status);
@@ -293,6 +302,9 @@ function saveStatus(status) {
         catch (error) {
             if (error instanceof Error) {
                 core.setFailed(error.message);
+                if (error.stack) {
+                    core.error(error.stack);
+                }
             }
         }
     });
@@ -333,6 +345,9 @@ function createOrUpdateComment(octokit, status) {
         catch (error) {
             if (error instanceof Error) {
                 core.setFailed(error.message);
+                if (error.stack) {
+                    core.error(error.stack);
+                }
             }
         }
     });
@@ -460,6 +475,9 @@ function hideOutdatedComment(octokit, comment) {
         catch (error) {
             if (error instanceof Error) {
                 core.setFailed(error.message);
+                if (error.stack) {
+                    core.error(error.stack);
+                }
             }
         }
     });
