@@ -180,7 +180,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(2186));
 const exec = __importStar(__nccwpck_require__(1514));
 const install_latest_version_1 = __nccwpck_require__(994);
-const upload_logs_1 = __nccwpck_require__(7081);
+const upload_1 = __nccwpck_require__(4831);
 const status_io_1 = __nccwpck_require__(2199);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
@@ -206,7 +206,7 @@ function run() {
                 core.setFailed(error.message);
             }
         }
-        yield (0, upload_logs_1.uploadLogs)();
+        yield (0, upload_1.upload)(status);
         yield (0, status_io_1.saveStatus)(status);
     });
 }
@@ -564,7 +564,7 @@ _Status_instances = new WeakSet(), _Status_markdownHeaderLines = function _Statu
 
 /***/ }),
 
-/***/ 7081:
+/***/ 4831:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -602,34 +602,35 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.uploadLogs = void 0;
+exports.upload = void 0;
 const core = __importStar(__nccwpck_require__(2186));
 const artifacts = __importStar(__nccwpck_require__(2605));
 const glob = __importStar(__nccwpck_require__(8090));
-const fs_1 = __nccwpck_require__(7147);
-const util_1 = __nccwpck_require__(3837);
-const stats = (0, util_1.promisify)(fs_1.stat);
-function uploadLogs() {
+/**
+ * Upload Diffblue Cover logs and other run artifacts.
+ * Artifacts are named using the topic slug so that multiple
+ * occurrences lead to uniquely named artifacts.
+ * All files within any `.diffblue` directory are included.
+ *
+ * @param status the status to find the topic slug from.
+ */
+function upload(status) {
     return __awaiter(this, void 0, void 0, function* () {
-        core.startGroup('Upload diffblue.zip artifact');
-        const rootDir = '.diffblue';
-        const files = [];
-        const globber = yield glob.create(rootDir);
-        const rawSearchResults = yield globber.glob();
-        for (const path of rawSearchResults) {
-            const pathStats = yield stats(path);
-            if (!pathStats.isDirectory()) {
-                core.info(`Including ${path} in upload`);
-                files.push(path);
-            }
+        core.startGroup(`Upload ${status.topic_slug}.zip artifact`);
+        const globber = yield glob.create('**/.diffblue/**');
+        const paths = yield globber.glob();
+        for (const path of paths) {
+            core.info(`Including ${path}`);
         }
-        yield artifacts
-            .create()
-            .uploadArtifact('diffblue', files, rootDir, {});
+        if (paths.length > 0) {
+            yield artifacts
+                .create()
+                .uploadArtifact(status.topic_slug, paths, '.', {});
+        }
         core.endGroup();
     });
 }
-exports.uploadLogs = uploadLogs;
+exports.upload = upload;
 
 
 /***/ }),
