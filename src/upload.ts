@@ -6,7 +6,10 @@ import {promisify} from 'util'
 
 const stats = promisify(stat)
 
-export async function uploadLogs(): Promise<void> {
+/**
+ * Upload Diffblue Cover logs and other run artifacts.
+ */
+export async function upload(): Promise<void> {
   core.startGroup('Upload diffblue.zip artifact')
   const rootDir = '.diffblue'
   const files: string[] = []

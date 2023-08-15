@@ -1,7 +1,7 @@
 import * as core from '@actions/core'
 import * as exec from '@actions/exec'
 import {installLatestVersion} from './install-latest-version'
-import {uploadLogs} from './upload-logs'
+import {upload} from './upload'
 import {readStatus, saveStatus} from './status-io'
 
 async function run(): Promise<void> {
@@ -31,7 +31,7 @@ async function run(): Promise<void> {
     }
   }
 
-  await uploadLogs()
+  await upload()
   await saveStatus(status)
 }
 
