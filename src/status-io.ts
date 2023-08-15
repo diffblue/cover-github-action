@@ -75,15 +75,31 @@ async function hidePreviousComments(
   status: Status
 ): Promise<void> {
   const comments = await findRecentComments(octokit, status)
-  const commentsToHide = comments
-    .filter(comment => comment.databaseId !== status.comment_id)
-    .filter(comment => !comment.isMinimised)
-    .filter(
-      comment => status.topic_slug && comment.body.includes(status.topic_slug)
-    )
+  const commentsToHide = comments.filter(comment =>
+    shouldHideComment(comment, status)
+  )
   for (const comment of commentsToHide) {
     await hideOutdatedComment(octokit, comment)
   }
+}
+
+/**
+ * Decide whether to hide a comment given the current status.
+ *
+ * @param comment The comment to hide, or not.
+ * @param status The status message identifying the anchor comment.
+ * @returns `true` iff the comment shoudld be hidden.
+ */
+function shouldHideComment(comment: Comment, status: Status): boolean {
+  return (
+    // don't hide the current comment
+    comment.databaseId !== status.comment_id &&
+    // don't hide hidden comments
+    !comment.isMinimised &&
+    // only hide comments referencing the current topic
+    status.topic_slug.length > 0 &&
+    comment.body.includes(status.topic_slug)
+  )
 }
 
 /**
