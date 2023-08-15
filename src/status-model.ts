@@ -46,8 +46,8 @@ export class Status {
   /** The GitHub REST/DB id of the pull request comment */
   comment_id?: number
 
-  /** The Diffblue Cover version, or error associated with it's discovery, if known */
-  version?: string | Error
+  /** The Diffblue Cover version, if known */
+  version?: string
 
   /** Any error associated with the overall status. */
   error?: unknown
@@ -107,12 +107,10 @@ export class Status {
    * @returns lines of markdown content showing version information
    */
   #markdownVersionLines(): string[] {
-    if (this.version === undefined) {
-      return []
-    } else if (this.version instanceof Error) {
-      return [`- Version: ${this.version.message} :exclamation:`]
+    if (this.version) {
+      return [`- Version: ${this.version}`]
     } else {
-      return [`- Version: ${this.version} :heavy_check_mark:`]
+      return []
     }
   }
 
