@@ -25,11 +25,19 @@ export async function readStatus(): Promise<Status> {
  * @param status the status to be saved.
  */
 export async function saveStatus(status: Status): Promise<void> {
-  writeFileSync(markdownFile, status.markdown(), {flag: 'w'})
-  writeFileSync(jsonFile, JSON.stringify(status, undefined, '  '), {flag: 'w'})
+  try {
+    writeFileSync(markdownFile, status.markdown(), {flag: 'w'})
+    writeFileSync(jsonFile, JSON.stringify(status, undefined, '  '), {
+      flag: 'w'
+    })
 
-  const octokit = new Octokit()
-  await createOrUpdateComment(octokit, status)
+    const octokit = new Octokit()
+    await createOrUpdateComment(octokit, status)
+  } catch (error) {
+    if (error instanceof Error) {
+      core.setFailed(error.message)
+    }
+  }
 }
 
 /**
@@ -41,27 +49,33 @@ async function createOrUpdateComment(
   octokit: Octokit,
   status: Status
 ): Promise<void> {
-  if (status.comment_id) {
-    const resp = await octokit.rest.issues.updateComment({
-      owner: status.owner,
-      repo: status.repo,
-      comment_id: status.comment_id,
-      body: status.markdown()
-    })
-    core.debug(`Updated Comment: ${resp.data.html_url}`)
-  } else {
-    const response = await octokit.rest.issues.createComment({
-      owner: status.owner,
-      repo: status.repo,
-      issue_number: status.issue_number,
-      body: status.markdown()
-    })
-    status.comment_id = response.data.id
-    writeFileSync(jsonFile, JSON.stringify(status, undefined, '  '), {
-      flag: 'w'
-    })
-    core.debug(`Created Comment: ${response.data.html_url}`)
-    await hidePreviousComments(octokit, status)
+  try {
+    if (status.comment_id) {
+      const resp = await octokit.rest.issues.updateComment({
+        owner: status.owner,
+        repo: status.repo,
+        comment_id: status.comment_id,
+        body: status.markdown()
+      })
+      core.debug(`Updated Comment: ${resp.data.html_url}`)
+    } else {
+      const response = await octokit.rest.issues.createComment({
+        owner: status.owner,
+        repo: status.repo,
+        issue_number: status.issue_number,
+        body: status.markdown()
+      })
+      status.comment_id = response.data.id
+      writeFileSync(jsonFile, JSON.stringify(status, undefined, '  '), {
+        flag: 'w'
+      })
+      core.debug(`Created Comment: ${response.data.html_url}`)
+      await hidePreviousComments(octokit, status)
+    }
+  } catch (error) {
+    if (error instanceof Error) {
+      core.setFailed(error.message)
+    }
   }
 }
 
@@ -177,15 +191,21 @@ async function hideOutdatedComment(
   octokit: Octokit,
   comment: Comment
 ): Promise<void> {
-  await octokit.graphql({
-    query: `
-      mutation hideOutdatedComment($id: ID!) {
-        minimizeComment(input: {subjectId: $id, classifier: OUTDATED}) {
-          clientMutationId
+  try {
+    await octokit.graphql({
+      query: `
+        mutation hideOutdatedComment($id: ID!) {
+          minimizeComment(input: {subjectId: $id, classifier: OUTDATED}) {
+            clientMutationId
+          }
         }
-      }
-    `,
-    id: comment.id
-  })
-  core.debug(`Hidden Comment: ${comment.url}`)
+      `,
+      id: comment.id
+    })
+    core.debug(`Hidden Comment: ${comment.url}`)
+  } catch (error) {
+    if (error instanceof Error) {
+      core.setFailed(error.message)
+    }
+  }
 }
