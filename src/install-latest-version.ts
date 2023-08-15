@@ -3,9 +3,11 @@ import * as io from '@actions/io'
 import * as tool from '@actions/tool-cache'
 
 import {lookupLatestVersion} from './lookup-latest-version'
+import {Status} from './status-model'
 
-export async function installLatestVersion(): Promise<void> {
+export async function installLatestVersion(status: Status): Promise<void> {
   const {name, version, url} = await lookupLatestVersion()
+  status.version = version
 
   let installation = tool.find(name, version)
   if (installation === '') {

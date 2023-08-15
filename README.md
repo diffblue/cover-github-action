@@ -16,6 +16,8 @@ jobs:
     steps:
       - name: Diffblue Cover
         uses: diffblue/cover-github-action@main
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
         with:
           license-key: ${{ secrets.DIFFBLUE_LICENSE_KEY }}
 ```

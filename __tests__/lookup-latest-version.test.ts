@@ -31,7 +31,7 @@ test('lookupLatestVersion() success', async () => {
   await expect(url).toBe('https://example.com/tool-name-1.2.3.zip')
 })
 
-test('lookupLatestVersion()  no status throws error', async () => {
+test('lookupLatestVersion() no status throws error', async () => {
   // Arrange
   HttpClient.prototype.get = jest.fn().mockImplementation(() => {
     return {
