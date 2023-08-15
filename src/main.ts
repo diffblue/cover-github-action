@@ -35,6 +35,9 @@ async function run(): Promise<void> {
   } catch (error) {
     if (error instanceof Error) {
       core.setFailed(error.message)
+      if (error.stack) {
+        core.error(error.stack)
+      }
     }
   }
 

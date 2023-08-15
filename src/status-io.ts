@@ -36,6 +36,9 @@ export async function saveStatus(status: Status): Promise<void> {
   } catch (error) {
     if (error instanceof Error) {
       core.setFailed(error.message)
+      if (error.stack) {
+        core.error(error.stack)
+      }
     }
   }
 }
@@ -75,6 +78,9 @@ async function createOrUpdateComment(
   } catch (error) {
     if (error instanceof Error) {
       core.setFailed(error.message)
+      if (error.stack) {
+        core.error(error.stack)
+      }
     }
   }
 }
@@ -206,6 +212,9 @@ async function hideOutdatedComment(
   } catch (error) {
     if (error instanceof Error) {
       core.setFailed(error.message)
+      if (error.stack) {
+        core.error(error.stack)
+      }
     }
   }
 }
