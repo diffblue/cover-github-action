@@ -179,7 +179,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(2186));
 const exec = __importStar(__nccwpck_require__(1514));
-const github = __importStar(__nccwpck_require__(5438));
 const skip = __importStar(__nccwpck_require__(8830));
 const install_latest_version_1 = __nccwpck_require__(994);
 const upload_1 = __nccwpck_require__(4831);
@@ -191,11 +190,6 @@ function run() {
         }
         const status = yield (0, status_io_1.readStatus)();
         try {
-            // Debug section temporarily added to understand build failures on merge
-            core.startGroup('Debug');
-            core.info(`ENV: ${JSON.stringify(process.env, undefined, '  ')}`);
-            core.info(`EVENT: ${JSON.stringify(github.context, undefined, '  ')}`);
-            core.endGroup();
             core.startGroup('Install Diffblue Cover');
             yield (0, install_latest_version_1.installLatestVersion)(status);
             yield exec.exec('dcover', ['--version']);
