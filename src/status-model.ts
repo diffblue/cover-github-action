@@ -13,6 +13,9 @@ declare let process: {
 }
 
 export class Status {
+  /** `true` iff the status is being actively worked on */
+  work_in_progress = true
+
   /** The GitHub repository owner */
   owner: string
 
@@ -43,8 +46,11 @@ export class Status {
   /** The GitHub REST/DB id of the pull request comment */
   comment_id?: number
 
-  /** The Diffblue Cover version, or error associated with it's discovery, if known */
-  version?: string | Error
+  /** The Diffblue Cover version, if known */
+  version?: string
+
+  /** Any error associated with the overall status. */
+  error?: unknown
 
   constructor() {
     const [owner, repo] = process.env.GITHUB_REPOSITORY.split('/')
@@ -78,7 +84,9 @@ export class Status {
   markdown(): string {
     return [
       ...this.#markdownHeaderLines(),
-      ...this.#markdownVersionLines()
+      ...this.#markdownVersionLines(),
+      ...this.#markdownErrorLines(),
+      ...this.#markdownWorkInProgressLines()
     ].join('\n')
   }
 
@@ -90,7 +98,7 @@ export class Status {
       `<!-- Topic: ${this.topic_slug} -->`,
       `### Diffblue Cover`,
       ``,
-      `- Run: [${this.run_link_title} :runner:](${this.run_link_url})`,
+      `- Run: [${this.run_link_title}](${this.run_link_url})`,
       `- Commit: ${this.sha}`
     ]
   }
@@ -99,12 +107,37 @@ export class Status {
    * @returns lines of markdown content showing version information
    */
   #markdownVersionLines(): string[] {
-    if (this.version === undefined) {
-      return []
-    } else if (this.version instanceof Error) {
-      return [`- Version: ${this.version.message} :exclamation:`]
+    if (this.version) {
+      return [`- Version: ${this.version}`]
     } else {
-      return [`- Version: ${this.version} :heavy_check_mark:`]
+      return []
+    }
+  }
+
+  /**
+   * @returns lines of markdown content showing error information
+   */
+  #markdownErrorLines(): string[] {
+    if (this.error instanceof Error) {
+      return [`- Error: \`${this.error.message}\` :exclamation:`]
+    } else if (this.error) {
+      return [`- Error: \`${this.error}\` :exclamation:`]
+    } else {
+      return []
+    }
+  }
+
+  /**
+   * @returns lines of markdown content showing work in progress information
+   */
+  #markdownWorkInProgressLines(): string[] {
+    if (this.work_in_progress) {
+      return [
+        ``,
+        `:construction: _This comment is under construction and will be updated on completion._ :construction: `
+      ]
+    } else {
+      return []
     }
   }
 }

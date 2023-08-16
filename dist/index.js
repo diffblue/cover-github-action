@@ -206,6 +206,7 @@ function run() {
             core.endGroup();
         }
         catch (error) {
+            status.error = error;
             if (error instanceof Error) {
                 core.setFailed(error.message);
                 if (error.stack) {
@@ -214,6 +215,7 @@ function run() {
             }
         }
         yield (0, upload_1.upload)(status);
+        status.work_in_progress = false;
         yield (0, status_io_1.saveStatus)(status);
     });
 }
@@ -309,25 +311,45 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.saveStatus = exports.readStatus = void 0;
+const io = __importStar(__nccwpck_require__(7436));
 const core = __importStar(__nccwpck_require__(2186));
 const action_1 = __nccwpck_require__(1231);
 const fs_1 = __nccwpck_require__(7147);
 const status_model_1 = __nccwpck_require__(2437);
+/** The directory where the status files should be written. */
+const dir = '.diffblue';
 /** The file where the status markdown should be written. */
-const markdownFile = '.diffblue/status.md';
+const markdownFile = `${dir}/status.md`;
 /** The file where the status JSON should be written. */
-const jsonFile = '.diffblue/status.json';
+const jsonFile = `${dir}/status.json`;
 /**
+ * Reads the previous Status or returns a fresh Status to begin work.
+ * The status is always marked as work-in-progress, and the comment is updated to match.
  * @returns the previously stored status, or else a fresly created one.
  */
 function readStatus() {
     return __awaiter(this, void 0, void 0, function* () {
+        let status;
         try {
-            return JSON.parse((0, fs_1.readFileSync)(jsonFile, 'utf8'));
+            status = JSON.parse((0, fs_1.readFileSync)(jsonFile, 'utf8'));
         }
         catch (error) {
-            return new status_model_1.Status();
+            status = new status_model_1.Status();
         }
+        try {
+            status.work_in_progress = true;
+            const octokit = new action_1.Octokit();
+            yield createOrUpdateComment(octokit, status);
+        }
+        catch (error) {
+            if (error instanceof Error) {
+                core.setFailed(error.message);
+                if (error.stack) {
+                    core.error(error.stack);
+                }
+            }
+        }
+        return status;
     });
 }
 exports.readStatus = readStatus;
@@ -338,6 +360,7 @@ exports.readStatus = readStatus;
 function saveStatus(status) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
+            yield io.mkdirP(dir);
             (0, fs_1.writeFileSync)(markdownFile, status.markdown(), { flag: 'w' });
             (0, fs_1.writeFileSync)(jsonFile, JSON.stringify(status, undefined, '  '), {
                 flag: 'w'
@@ -381,6 +404,7 @@ function createOrUpdateComment(octokit, status) {
                     body: status.markdown()
                 });
                 status.comment_id = response.data.id;
+                yield io.mkdirP(dir);
                 (0, fs_1.writeFileSync)(jsonFile, JSON.stringify(status, undefined, '  '), {
                     flag: 'w'
                 });
@@ -565,7 +589,7 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
     if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
     return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
 };
-var _Status_instances, _Status_markdownHeaderLines, _Status_markdownVersionLines;
+var _Status_instances, _Status_markdownHeaderLines, _Status_markdownVersionLines, _Status_markdownErrorLines, _Status_markdownWorkInProgressLines;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Status = void 0;
 const core = __importStar(__nccwpck_require__(2186));
@@ -574,6 +598,8 @@ class Status {
     constructor() {
         var _a, _b, _c;
         _Status_instances.add(this);
+        /** `true` iff the status is being actively worked on */
+        this.work_in_progress = true;
         const [owner, repo] = process.env.GITHUB_REPOSITORY.split('/');
         this.owner = owner;
         this.repo = repo;
@@ -600,7 +626,9 @@ class Status {
     markdown() {
         return [
             ...__classPrivateFieldGet(this, _Status_instances, "m", _Status_markdownHeaderLines).call(this),
-            ...__classPrivateFieldGet(this, _Status_instances, "m", _Status_markdownVersionLines).call(this)
+            ...__classPrivateFieldGet(this, _Status_instances, "m", _Status_markdownVersionLines).call(this),
+            ...__classPrivateFieldGet(this, _Status_instances, "m", _Status_markdownErrorLines).call(this),
+            ...__classPrivateFieldGet(this, _Status_instances, "m", _Status_markdownWorkInProgressLines).call(this)
         ].join('\n');
     }
 }
@@ -610,18 +638,35 @@ _Status_instances = new WeakSet(), _Status_markdownHeaderLines = function _Statu
         `<!-- Topic: ${this.topic_slug} -->`,
         `### Diffblue Cover`,
         ``,
-        `- Run: [${this.run_link_title} :runner:](${this.run_link_url})`,
+        `- Run: [${this.run_link_title}](${this.run_link_url})`,
         `- Commit: ${this.sha}`
     ];
 }, _Status_markdownVersionLines = function _Status_markdownVersionLines() {
-    if (this.version === undefined) {
-        return [];
-    }
-    else if (this.version instanceof Error) {
-        return [`- Version: ${this.version.message} :exclamation:`];
+    if (this.version) {
+        return [`- Version: ${this.version}`];
     }
     else {
-        return [`- Version: ${this.version} :heavy_check_mark:`];
+        return [];
+    }
+}, _Status_markdownErrorLines = function _Status_markdownErrorLines() {
+    if (this.error instanceof Error) {
+        return [`- Error: \`${this.error.message}\` :exclamation:`];
+    }
+    else if (this.error) {
+        return [`- Error: \`${this.error}\` :exclamation:`];
+    }
+    else {
+        return [];
+    }
+}, _Status_markdownWorkInProgressLines = function _Status_markdownWorkInProgressLines() {
+    if (this.work_in_progress) {
+        return [
+            ``,
+            `:construction: _This comment is under construction and will be updated on completion._ :construction: `
+        ];
+    }
+    else {
+        return [];
     }
 };
 
