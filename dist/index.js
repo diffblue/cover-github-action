@@ -293,14 +293,10 @@ exports.skipEventType = skipEventType;
  */
 function skipDependabot() {
     return __awaiter(this, void 0, void 0, function* () {
-        const actor = github.context.payload.actor;
+        const actor = github.context.actor;
         const result = actor === 'dependabot[bot]';
         if (result) {
             core.info(`Skipping event actor: ${actor}`);
-        }
-        else {
-            core.info(`Allowing event actor: ${actor}`);
-            core.info(`EVENT: ${JSON.stringify(github.context, undefined, ' ')}`);
         }
         return result;
     });

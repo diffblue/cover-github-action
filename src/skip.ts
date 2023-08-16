@@ -24,13 +24,10 @@ export async function skipEventType(): Promise<boolean> {
  * @returns `true` iff the event was sourced from dependabot
  */
 export async function skipDependabot(): Promise<boolean> {
-  const actor = github.context.payload.actor
+  const actor = github.context.actor
   const result = actor === 'dependabot[bot]'
   if (result) {
     core.info(`Skipping event actor: ${actor}`)
-  } else {
-    core.info(`Allowing event actor: ${actor}`)
-    core.info(`EVENT: ${JSON.stringify(github.context, undefined, ' ')}`)
   }
   return result
 }
