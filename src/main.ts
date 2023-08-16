@@ -16,6 +16,8 @@ async function run(): Promise<void> {
     await git.prepare(status)
     await cover.install(status)
     await cover.activate()
+    await cover.createPreFlight()
+    await cover.fixBuildIfNeeded(status)
     await cover.create(status)
     await git.push(status)
   } catch (error) {

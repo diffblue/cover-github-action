@@ -17,6 +17,9 @@ inputs:
   create-args:
     required: false
     description: Additional command line arguments for the `dcover create` command.
+  refactor-args:
+    required: false
+    description: Additional command line arguments for the `dcover refactor` command.
   topic-id-differentiator:
     required: false
     description: Optional string to differentiate multiple uses of the actions within a single workflow.
