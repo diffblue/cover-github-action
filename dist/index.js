@@ -270,7 +270,7 @@ const github = __importStar(__nccwpck_require__(5438));
  */
 function skip() {
     return __awaiter(this, void 0, void 0, function* () {
-        return skipEventType() || skipDependabot();
+        return (yield skipEventType()) || (yield skipDependabot());
     });
 }
 exports.skip = skip;
