@@ -81,32 +81,43 @@ export class Status {
   /**
    * @returns this status rendered to markdown for use in a pull request comment
    */
-  markdown(): string {
+  comment(): string {
     return [
-      ...this.#markdownHeaderLines(),
-      ...this.#markdownVersionLines(),
-      ...this.#markdownErrorLines(),
-      ...this.#markdownWorkInProgressLines()
+      ...this.markdownHeaderLines(),
+      ...this.markdownRunLines(),
+      ...this.markdownCommitLines(),
+      ...this.markdownVersionLines(),
+      ...this.markdownErrorLines(),
+      ...this.markdownWorkInProgressLines(),
+      ``
     ].join('\n')
   }
 
   /**
-   * @returns lines of markdown content representing the heading of the comment
+   * @returns lines of markdown heading content
    */
-  #markdownHeaderLines(): string[] {
-    return [
-      `<!-- Topic: ${this.topic_slug} -->`,
-      `### Diffblue Cover`,
-      ``,
-      `- Run: [${this.run_link_title}](${this.run_link_url})`,
-      `- Commit: ${this.sha}`
-    ]
+  private markdownHeaderLines(): string[] {
+    return [`<!-- Topic: ${this.topic_slug} -->`, `### Diffblue Cover`, ``]
+  }
+
+  /**
+   * @returns lines of markdown content showing run information
+   */
+  private markdownRunLines(): string[] {
+    return [`- Run: [${this.run_link_title}](${this.run_link_url})`]
+  }
+
+  /**
+   * @returns lines of markdown content showing commit information
+   */
+  private markdownCommitLines(): string[] {
+    return [`- Commit: \`${this.sha}\``]
   }
 
   /**
    * @returns lines of markdown content showing version information
    */
-  #markdownVersionLines(): string[] {
+  private markdownVersionLines(): string[] {
     if (this.version) {
       return [`- Version: ${this.version}`]
     } else {
@@ -117,7 +128,7 @@ export class Status {
   /**
    * @returns lines of markdown content showing error information
    */
-  #markdownErrorLines(): string[] {
+  private markdownErrorLines(): string[] {
     if (this.error instanceof Error) {
       return [`- Error: \`${this.error.message}\` :exclamation:`]
     } else if (this.error) {
@@ -130,7 +141,7 @@ export class Status {
   /**
    * @returns lines of markdown content showing work in progress information
    */
-  #markdownWorkInProgressLines(): string[] {
+  private markdownWorkInProgressLines(): string[] {
     if (this.work_in_progress) {
       return [
         ``,

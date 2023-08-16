@@ -49,7 +49,7 @@ export async function readStatus(): Promise<Status> {
 export async function saveStatus(status: Status): Promise<void> {
   try {
     await io.mkdirP(dir)
-    writeFileSync(markdownFile, status.markdown(), {flag: 'w'})
+    writeFileSync(markdownFile, status.comment(), {flag: 'w'})
     writeFileSync(jsonFile, JSON.stringify(status, undefined, '  '), {
       flag: 'w'
     })
@@ -81,7 +81,7 @@ async function createOrUpdateComment(
         owner: status.owner,
         repo: status.repo,
         comment_id: status.comment_id,
-        body: status.markdown()
+        body: status.comment()
       })
       core.debug(`Updated Comment: ${resp.data.html_url}`)
     } else {
@@ -89,7 +89,7 @@ async function createOrUpdateComment(
         owner: status.owner,
         repo: status.repo,
         issue_number: status.issue_number,
-        body: status.markdown()
+        body: status.comment()
       })
       status.comment_id = response.data.id
       await io.mkdirP(dir)
