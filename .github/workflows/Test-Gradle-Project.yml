@@ -39,5 +39,10 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
+          # License key used to activate the installation
           license-key: ${{ secrets.DIFFBLUE_LICENSE_KEY }}
+          # User name and email used to author commits
+          user-name: Diffblue CI
+          user-email: db-ci-platform@diffblue.com
+          # Add a differentiator based on the matrix
           topic-id-differentiator: ${{ matrix.os }}

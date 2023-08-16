@@ -19,7 +19,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
+          # License key used to activate the installation
           license-key: ${{ secrets.DIFFBLUE_LICENSE_KEY }}
+          # User name and email used to author commits
+          user-name: Diffblue CI
+          user-email: db-ci-platform@diffblue.com
 ```
 
 The action only supports `pull_request` events, and will do nothing for if run under other events.
