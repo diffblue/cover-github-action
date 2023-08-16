@@ -179,14 +179,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(2186));
 const exec = __importStar(__nccwpck_require__(1514));
-const skip = __importStar(__nccwpck_require__(8830));
+const skip_1 = __nccwpck_require__(8830);
 const install_latest_version_1 = __nccwpck_require__(994);
 const upload_1 = __nccwpck_require__(4831);
 const summary_1 = __nccwpck_require__(8608);
 const status_io_1 = __nccwpck_require__(2199);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
-        if (skip.skipEventType()) {
+        if (yield (0, skip_1.skip)()) {
             return;
         }
         const status = yield (0, status_io_1.readStatus)();
@@ -252,22 +252,60 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.skipEventType = void 0;
+exports.skipDependabot = exports.skipEventType = exports.skip = void 0;
 const core = __importStar(__nccwpck_require__(2186));
 const github = __importStar(__nccwpck_require__(5438));
+/**
+ * @returns `true` iff the action should be skipped for any reason
+ */
+function skip() {
+    return __awaiter(this, void 0, void 0, function* () {
+        return skipEventType() || skipDependabot();
+    });
+}
+exports.skip = skip;
 /**
  * @returns `true` iff the action should be skipped due to the event type.
  */
 function skipEventType() {
-    const eventName = github.context.eventName;
-    const skip = eventName !== 'pull_request';
-    if (skip) {
-        core.info(`Skipping event type: ${eventName}`);
-    }
-    return skip;
+    return __awaiter(this, void 0, void 0, function* () {
+        const eventName = github.context.eventName;
+        const result = eventName !== 'pull_request';
+        if (result) {
+            core.info(`Skipping event type: ${eventName}`);
+        }
+        return result;
+    });
 }
 exports.skipEventType = skipEventType;
+/**
+ * @returns `true` iff the event was sourced from dependabot
+ */
+function skipDependabot() {
+    return __awaiter(this, void 0, void 0, function* () {
+        const actor = github.context.payload.actor;
+        const result = actor === 'dependabot[bot]';
+        if (result) {
+            core.info(`Skipping event actor: ${actor}`);
+        }
+        else {
+            core.info(`Allowing event actor: ${actor}`);
+            core.info(`EVENT: ${JSON.stringify(github.context, undefined, ' ')}`);
+        }
+        return result;
+    });
+}
+exports.skipDependabot = skipDependabot;
 
 
 /***/ }),

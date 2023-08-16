@@ -1,13 +1,13 @@
 import * as core from '@actions/core'
 import * as exec from '@actions/exec'
-import * as skip from './skip'
+import {skip} from './skip'
 import {installLatestVersion} from './install-latest-version'
 import {upload} from './upload'
 import {summary} from './summary'
 import {readStatus} from './status-io'
 
 async function run(): Promise<void> {
-  if (skip.skipEventType()) {
+  if (await skip()) {
     return
   }
 
