@@ -182,6 +182,7 @@ const exec = __importStar(__nccwpck_require__(1514));
 const skip = __importStar(__nccwpck_require__(8830));
 const install_latest_version_1 = __nccwpck_require__(994);
 const upload_1 = __nccwpck_require__(4831);
+const summary_1 = __nccwpck_require__(8608);
 const status_io_1 = __nccwpck_require__(2199);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
@@ -215,8 +216,7 @@ function run() {
             }
         }
         yield (0, upload_1.upload)(status);
-        status.work_in_progress = false;
-        yield (0, status_io_1.saveStatus)(status);
+        yield (0, summary_1.summary)(status);
     });
 }
 run();
@@ -361,7 +361,7 @@ function saveStatus(status) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             yield io.mkdirP(dir);
-            (0, fs_1.writeFileSync)(markdownFile, status.markdown(), { flag: 'w' });
+            (0, fs_1.writeFileSync)(markdownFile, status.comment(), { flag: 'w' });
             (0, fs_1.writeFileSync)(jsonFile, JSON.stringify(status, undefined, '  '), {
                 flag: 'w'
             });
@@ -392,7 +392,7 @@ function createOrUpdateComment(octokit, status) {
                     owner: status.owner,
                     repo: status.repo,
                     comment_id: status.comment_id,
-                    body: status.markdown()
+                    body: status.comment()
                 });
                 core.debug(`Updated Comment: ${resp.data.html_url}`);
             }
@@ -401,7 +401,7 @@ function createOrUpdateComment(octokit, status) {
                     owner: status.owner,
                     repo: status.repo,
                     issue_number: status.issue_number,
-                    body: status.markdown()
+                    body: status.comment()
                 });
                 status.comment_id = response.data.id;
                 yield io.mkdirP(dir);
@@ -584,12 +584,6 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
-var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (receiver, state, kind, f) {
-    if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a getter");
-    if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
-    return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
-};
-var _Status_instances, _Status_markdownHeaderLines, _Status_markdownVersionLines, _Status_markdownErrorLines, _Status_markdownWorkInProgressLines;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Status = void 0;
 const core = __importStar(__nccwpck_require__(2186));
@@ -597,7 +591,6 @@ const github = __importStar(__nccwpck_require__(5438));
 class Status {
     constructor() {
         var _a, _b, _c;
-        _Status_instances.add(this);
         /** `true` iff the status is being actively worked on */
         this.work_in_progress = true;
         const [owner, repo] = process.env.GITHUB_REPOSITORY.split('/');
@@ -623,52 +616,143 @@ class Status {
     /**
      * @returns this status rendered to markdown for use in a pull request comment
      */
-    markdown() {
+    comment() {
         return [
-            ...__classPrivateFieldGet(this, _Status_instances, "m", _Status_markdownHeaderLines).call(this),
-            ...__classPrivateFieldGet(this, _Status_instances, "m", _Status_markdownVersionLines).call(this),
-            ...__classPrivateFieldGet(this, _Status_instances, "m", _Status_markdownErrorLines).call(this),
-            ...__classPrivateFieldGet(this, _Status_instances, "m", _Status_markdownWorkInProgressLines).call(this)
+            ...this.markdownHeaderLines(),
+            ...this.markdownRunLines(),
+            ...this.markdownCommitLines(),
+            ...this.markdownVersionLines(),
+            ...this.markdownErrorLines(),
+            ...this.markdownWorkInProgressLines(),
+            ``
         ].join('\n');
+    }
+    /**
+     * @returns this status rendered to markdown for use in a job summary
+     */
+    summary() {
+        return [
+            ...this.markdownHeaderLines(),
+            ...this.markdownVersionLines(),
+            ...this.markdownErrorLines(),
+            ``
+        ].join('\n');
+    }
+    /**
+     * @returns lines of markdown heading content
+     */
+    markdownHeaderLines() {
+        return [`<!-- Topic: ${this.topic_slug} -->`, `### Diffblue Cover`, ``];
+    }
+    /**
+     * @returns lines of markdown content showing run information
+     */
+    markdownRunLines() {
+        return [`- Run: [${this.run_link_title}](${this.run_link_url})`];
+    }
+    /**
+     * @returns lines of markdown content showing commit information
+     */
+    markdownCommitLines() {
+        return [`- Commit: \`${this.sha}\``];
+    }
+    /**
+     * @returns lines of markdown content showing version information
+     */
+    markdownVersionLines() {
+        if (this.version) {
+            return [`- Version: ${this.version}`];
+        }
+        else {
+            return [];
+        }
+    }
+    /**
+     * @returns lines of markdown content showing error information
+     */
+    markdownErrorLines() {
+        if (this.error instanceof Error) {
+            return [`- Error: \`${this.error.message}\` :exclamation:`];
+        }
+        else if (this.error) {
+            return [`- Error: \`${this.error}\` :exclamation:`];
+        }
+        else {
+            return [];
+        }
+    }
+    /**
+     * @returns lines of markdown content showing work in progress information
+     */
+    markdownWorkInProgressLines() {
+        if (this.work_in_progress) {
+            return [
+                ``,
+                `:construction: _This comment is under construction and will be updated on completion._ :construction: `
+            ];
+        }
+        else {
+            return [];
+        }
     }
 }
 exports.Status = Status;
-_Status_instances = new WeakSet(), _Status_markdownHeaderLines = function _Status_markdownHeaderLines() {
-    return [
-        `<!-- Topic: ${this.topic_slug} -->`,
-        `### Diffblue Cover`,
-        ``,
-        `- Run: [${this.run_link_title}](${this.run_link_url})`,
-        `- Commit: ${this.sha}`
-    ];
-}, _Status_markdownVersionLines = function _Status_markdownVersionLines() {
-    if (this.version) {
-        return [`- Version: ${this.version}`];
+
+
+/***/ }),
+
+/***/ 8608:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
     }
-    else {
-        return [];
-    }
-}, _Status_markdownErrorLines = function _Status_markdownErrorLines() {
-    if (this.error instanceof Error) {
-        return [`- Error: \`${this.error.message}\` :exclamation:`];
-    }
-    else if (this.error) {
-        return [`- Error: \`${this.error}\` :exclamation:`];
-    }
-    else {
-        return [];
-    }
-}, _Status_markdownWorkInProgressLines = function _Status_markdownWorkInProgressLines() {
-    if (this.work_in_progress) {
-        return [
-            ``,
-            `:construction: _This comment is under construction and will be updated on completion._ :construction: `
-        ];
-    }
-    else {
-        return [];
-    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
 };
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.summary = void 0;
+const core = __importStar(__nccwpck_require__(2186));
+const status_io_1 = __nccwpck_require__(2199);
+/**
+ * @param status the status to be summarised and saved.
+ */
+function summary(status) {
+    return __awaiter(this, void 0, void 0, function* () {
+        status.work_in_progress = false;
+        yield (0, status_io_1.saveStatus)(status);
+        yield core.summary.addRaw(status.summary()).write();
+    });
+}
+exports.summary = summary;
 
 
 /***/ }),

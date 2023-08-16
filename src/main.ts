@@ -3,7 +3,8 @@ import * as exec from '@actions/exec'
 import * as skip from './skip'
 import {installLatestVersion} from './install-latest-version'
 import {upload} from './upload'
-import {readStatus, saveStatus} from './status-io'
+import {summary} from './summary'
+import {readStatus} from './status-io'
 
 async function run(): Promise<void> {
   if (skip.skipEventType()) {
@@ -41,8 +42,7 @@ async function run(): Promise<void> {
   }
 
   await upload(status)
-  status.work_in_progress = false
-  await saveStatus(status)
+  await summary(status)
 }
 
 run()
