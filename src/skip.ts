@@ -5,7 +5,7 @@ import * as github from '@actions/github'
  * @returns `true` iff the action should be skipped for any reason
  */
 export async function skip(): Promise<boolean> {
-  return skipEventType() || skipDependabot()
+  return (await skipEventType()) || (await skipDependabot())
 }
 
 /**
