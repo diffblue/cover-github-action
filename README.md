@@ -1,5 +1,7 @@
 # Cover GitHub Action
 
+Mahahhaha
+
 This project provides a GitHub Action for running Diffblue Cover.
 
 ## Usage
