@@ -94,6 +94,18 @@ export class Status {
   }
 
   /**
+   * @returns this status rendered to markdown for use in a job summary
+   */
+  summary(): string {
+    return [
+      ...this.markdownHeaderLines(),
+      ...this.markdownVersionLines(),
+      ...this.markdownErrorLines(),
+      ``
+    ].join('\n')
+  }
+
+  /**
    * @returns lines of markdown heading content
    */
   private markdownHeaderLines(): string[] {
