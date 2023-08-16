@@ -36,3 +36,14 @@ export async function prepare(status: Status): Promise<void> {
   await exec.exec('git', ['checkout', status.sha])
   core.endGroup()
 }
+
+/**
+ * Runs `git push` to push changes up.
+ *
+ * @param status the status to be updated and saved.
+ */
+export async function push(status: Status): Promise<void> {
+  core.startGroup('Push')
+  await exec.exec('git', ['push', 'origin', `HEAD:${status.ref}`])
+  core.endGroup()
+}

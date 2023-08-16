@@ -34,6 +34,8 @@ async function run(): Promise<void> {
     await exec.exec('dcover', ['activate', keyValue])
 
     core.endGroup()
+
+    await git.push(status)
   } catch (error) {
     status.error = error
     if (error instanceof Error) {
