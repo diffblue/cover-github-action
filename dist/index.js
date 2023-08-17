@@ -46,6 +46,7 @@ const exec = __importStar(__nccwpck_require__(1514));
 const git = __importStar(__nccwpck_require__(3374));
 const install_latest_version_1 = __nccwpck_require__(994);
 const status_io_1 = __nccwpck_require__(2199);
+const fs_1 = __nccwpck_require__(7147);
 /**
  * Installs `dcover` for use by other commands and functions.
  *
@@ -147,6 +148,21 @@ function create(status) {
             ...extraArgs('create-args')
         ]);
         yield git.commit(status, 'Added tests created with Diffblue Cover');
+        const globber = yield glob.create('**/.diffblue/reports/report.json');
+        const reportFiles = yield globber.glob();
+        for (const reportFile of reportFiles) {
+            const report = JSON.parse((0, fs_1.readFileSync)(reportFile, 'utf8'));
+            let reportName = reportFile.substring(0, reportFile.length - '/.diffblue/reports/report.json'.length);
+            if (reportName.startsWith(process.env.GITHUB_WORKSPACE)) {
+                reportName = reportName.substring(process.env.GITHUB_WORKSPACE.length);
+            }
+            reportName = reportName.replace('\\', '/');
+            if (reportName === '' || reportName === '/') {
+                reportName = '(root module)';
+            }
+            status.reports.set(reportName, report);
+        }
+        (0, status_io_1.saveStatus)(status);
         core.endGroup();
     });
 }
@@ -595,7 +611,6 @@ function skipOwnCommits() {
         const config = yield configuredAuthor();
         const author = yield headCommitAuthor();
         const result = config !== undefined && author !== undefined && config === author;
-        core.info(`COMPARISON C${config}C===A${author}A => ${result}`);
         if (result) {
             core.info(`Skipping commits authored by: ${author}`);
         }
@@ -959,7 +974,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.Status = void 0;
+exports.Report = exports.Status = void 0;
 const core = __importStar(__nccwpck_require__(2186));
 const github = __importStar(__nccwpck_require__(5438));
 class Status {
@@ -967,6 +982,10 @@ class Status {
         var _a, _b, _c, _d, _e;
         /** `true` iff the status is being actively worked on */
         this.work_in_progress = true;
+        /**
+         * Report summaries from any complete `dcover create` runs
+         */
+        this.reports = new Map();
         const [owner, repo] = process.env.GITHUB_REPOSITORY.split('/');
         this.owner = owner;
         this.repo = repo;
@@ -998,6 +1017,7 @@ class Status {
             ...this.markdownCommitLines(),
             ...this.markdownVersionLines(),
             ...this.markdownErrorLines(),
+            ...this.markdownReportsLines(),
             ...this.markdownWorkInProgressLines(),
             ``
         ].join('\n');
@@ -1010,6 +1030,7 @@ class Status {
             ...this.markdownHeaderLines(),
             ...this.markdownVersionLines(),
             ...this.markdownErrorLines(),
+            ...this.markdownReportsLines(),
             ``
         ].join('\n');
     }
@@ -1029,7 +1050,7 @@ class Status {
      * @returns lines of markdown content showing commit information
      */
     markdownCommitLines() {
-        return [`- Commit: \`${this.sha}\``];
+        return [`- Commit: ${this.sha}`];
     }
     /**
      * @returns lines of markdown content showing version information
@@ -1057,6 +1078,26 @@ class Status {
         }
     }
     /**
+     * @returns lines of markdown content showing reports information
+     */
+    markdownReportsLines() {
+        if (this.reports.size === 0) {
+            return [];
+        }
+        else {
+            const table = [
+                ``,
+                `| Report | Classes | Methods | Tests |`,
+                `|:-------|--------:|--------:|------:|`
+            ];
+            for (const [name, report] of this.reports) {
+                table.push(`| ${name} | ${report.summary.classesCount} | ${report.summary.methodsCount} | ${report.summary.completeTestCount} |`);
+            }
+            table.push(``);
+            return table;
+        }
+    }
+    /**
      * @returns lines of markdown content showing work in progress information
      */
     markdownWorkInProgressLines() {
@@ -1072,6 +1113,32 @@ class Status {
     }
 }
 exports.Status = Status;
+/** Model classes of just enough of a `./diffblue/reports/report.json` to summarise */
+class Report {
+    constructor() {
+        this.meta = new ReportMeta();
+        this.run = new ReportRun();
+        this.summary = new ReportSummary();
+    }
+}
+exports.Report = Report;
+class ReportMeta {
+    constructor() {
+        this.reportVersion = '2.5';
+    }
+}
+class ReportRun {
+    constructor() {
+        this.totalTime = 0;
+    }
+}
+class ReportSummary {
+    constructor() {
+        this.classesCount = 0;
+        this.methodsCount = 0;
+        this.completeTestCount = 0;
+    }
+}
 
 
 /***/ }),
