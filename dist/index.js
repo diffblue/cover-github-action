@@ -1,6 +1,182 @@
 require('./sourcemap-register.js');/******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
+/***/ 8060:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.create = exports.fixBuild = exports.fixBuildIfNeeded = exports.createPreFlight = exports.activate = exports.install = void 0;
+const glob = __importStar(__nccwpck_require__(8090));
+const core = __importStar(__nccwpck_require__(2186));
+const exec = __importStar(__nccwpck_require__(1514));
+const git = __importStar(__nccwpck_require__(3374));
+const install_latest_version_1 = __nccwpck_require__(994);
+const status_io_1 = __nccwpck_require__(2199);
+/**
+ * Installs `dcover` for use by other commands and functions.
+ *
+ * @param status the status to be updated and saved.
+ */
+function install(status) {
+    return __awaiter(this, void 0, void 0, function* () {
+        core.startGroup('Install');
+        yield (0, install_latest_version_1.installLatestVersion)(status);
+        yield exec.exec('dcover', ['--version']);
+        core.endGroup();
+        (0, status_io_1.saveStatus)(status);
+    });
+}
+exports.install = install;
+/**
+ * Runs `dcover activate` using the `license-key` inputs.
+ */
+function activate() {
+    return __awaiter(this, void 0, void 0, function* () {
+        core.startGroup('Activate');
+        const keyName = 'license-key';
+        const keyValue = core.getInput(keyName);
+        if (keyValue === '') {
+            throw new Error([
+                `Missing '${keyName}' configuration:`,
+                `Please ensure that the action has a '${keyName}' configured, typically using a GitHub secret.`,
+                `Please ensure that all users pushing to the repository has access to the necessary secret.`
+            ].join('\n'));
+        }
+        yield exec.exec('dcover', ['activate', keyValue]);
+        core.endGroup();
+    });
+}
+exports.activate = activate;
+/**
+ * Runs `dcover create --pre-flight`.
+ */
+function createPreFlight() {
+    return __awaiter(this, void 0, void 0, function* () {
+        core.startGroup('Create (pre-flight)');
+        yield exec.exec('dcover', [
+            'create',
+            '--batch',
+            '--pre-flight',
+            ...workingDirectoryArgs(),
+            ...extraArgs('create-args')
+        ]);
+        core.endGroup();
+    });
+}
+exports.createPreFlight = createPreFlight;
+/**
+ * Runs `dcover fix-build`, if a `.diffblue/refactorings.yml` is found.
+ *
+ * @param status the status to be updated and saved.
+ */
+function fixBuildIfNeeded(status) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const globber = yield glob.create('**/.diffblue/refactorings.yml');
+        const refactorings = yield globber.glob();
+        if (refactorings) {
+            yield fixBuild(status);
+        }
+    });
+}
+exports.fixBuildIfNeeded = fixBuildIfNeeded;
+/**
+ * Runs `dcover fix-build`.
+ *
+ * @param status the status to be updated and saved.
+ */
+function fixBuild(status) {
+    return __awaiter(this, void 0, void 0, function* () {
+        core.startGroup('Fix build');
+        yield exec.exec('dcover', [
+            'fix-build',
+            '--batch',
+            ...workingDirectoryArgs(),
+            ...extraArgs('refactor-args')
+        ]);
+        yield git.commit(status, 'Fixed build for use with Diffblue Cover');
+        core.endGroup();
+    });
+}
+exports.fixBuild = fixBuild;
+/**
+ * Runs `dcover create`.
+ *
+ * @param status the status to be updated and saved.
+ */
+function create(status) {
+    return __awaiter(this, void 0, void 0, function* () {
+        core.startGroup('Create');
+        yield exec.exec('dcover', [
+            'create',
+            '--batch',
+            ...workingDirectoryArgs(),
+            ...extraArgs('create-args')
+        ]);
+        yield git.commit(status, 'Added tests created with Diffblue Cover');
+        core.endGroup();
+    });
+}
+exports.create = create;
+/**
+ * @returns the `--working-directory` arguments based on `working-directory` input, or an empty array.
+ */
+function workingDirectoryArgs() {
+    const workingDirectory = core.getInput('working-directory');
+    if (workingDirectory) {
+        return ['--working-directory', workingDirectory];
+    }
+    else {
+        return [];
+    }
+}
+/**
+ * @param input the name of the extra-args input to split.
+ * @returns the extra arguments split on spaces, or an empty array.
+ */
+function extraArgs(input) {
+    return core
+        .getInput(input)
+        .split(/\s+/)
+        .filter(arg => arg !== '');
+}
+
+
+/***/ }),
+
 /***/ 3374:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -39,7 +215,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.prepare = void 0;
+exports.push = exports.commit = exports.prepare = void 0;
 const core = __importStar(__nccwpck_require__(2186));
 const exec = __importStar(__nccwpck_require__(1514));
 /**
@@ -73,6 +249,43 @@ function prepare(status) {
     });
 }
 exports.prepare = prepare;
+/**
+ * Runs `git commit` to commit modified files.
+ *
+ * @param status the status to be updated and saved.
+ */
+function commit(status, message) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const result = yield exec.getExecOutput('git', [
+            'status',
+            '--untracked-files=all',
+            '--porcelain'
+        ]);
+        const charIndexOfFile = 3;
+        const filesToAdd = result.stdout
+            .split(/\r?\n/)
+            .map(file => file.substring(charIndexOfFile))
+            .filter(file => !file.startsWith('.diffblue/'))
+            .filter(file => !file.includes('/.diffblue/'))
+            .filter(file => file !== '');
+        if (filesToAdd && filesToAdd.length > 0) {
+            yield exec.exec('git', ['add', ...filesToAdd]);
+            yield exec.exec('git', ['commit', '--message', message]);
+        }
+    });
+}
+exports.commit = commit;
+/**
+ * Runs `git push` to push changes up.
+ *
+ * @param status the status to be updated and saved.
+ */
+function push(status) {
+    return __awaiter(this, void 0, void 0, function* () {
+        yield exec.exec('git', ['push', 'origin', `HEAD:${status.ref}`]);
+    });
+}
+exports.push = push;
 
 
 /***/ }),
@@ -254,10 +467,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(2186));
-const exec = __importStar(__nccwpck_require__(1514));
 const git = __importStar(__nccwpck_require__(3374));
+const cover = __importStar(__nccwpck_require__(8060));
 const skip_1 = __nccwpck_require__(8830);
-const install_latest_version_1 = __nccwpck_require__(994);
 const upload_1 = __nccwpck_require__(4831);
 const summary_1 = __nccwpck_require__(8608);
 const status_io_1 = __nccwpck_require__(2199);
@@ -269,20 +481,12 @@ function run() {
         const status = yield (0, status_io_1.readStatus)();
         try {
             yield git.prepare(status);
-            core.startGroup('Install Diffblue Cover');
-            yield (0, install_latest_version_1.installLatestVersion)(status);
-            yield exec.exec('dcover', ['--version']);
-            const keyName = 'license-key';
-            const keyValue = core.getInput(keyName);
-            if (keyValue === '') {
-                throw new Error([
-                    `Missing '${keyName}' configuration:`,
-                    `Please ensure that the action has a '${keyName}' configured, typically using a GitHub secret.`,
-                    `Please ensure that all users pushing to the repository has access to the necessary secret.`
-                ].join('\n'));
-            }
-            yield exec.exec('dcover', ['activate', keyValue]);
-            core.endGroup();
+            yield cover.install(status);
+            yield cover.activate();
+            yield cover.createPreFlight();
+            yield cover.fixBuildIfNeeded(status);
+            yield cover.create(status);
+            yield git.push(status);
         }
         catch (error) {
             status.error = error;
