@@ -55,6 +55,11 @@ export class Status {
   /** Any error associated with the overall status. */
   error?: unknown
 
+  /**
+   * Report summaries from any complete `dcover create` runs
+   */
+  reports: Map<string, Report> = new Map()
+
   constructor() {
     const [owner, repo] = process.env.GITHUB_REPOSITORY.split('/')
     this.owner = owner
@@ -92,6 +97,7 @@ export class Status {
       ...this.markdownCommitLines(),
       ...this.markdownVersionLines(),
       ...this.markdownErrorLines(),
+      ...this.markdownReportsLines(),
       ...this.markdownWorkInProgressLines(),
       ``
     ].join('\n')
@@ -105,6 +111,7 @@ export class Status {
       ...this.markdownHeaderLines(),
       ...this.markdownVersionLines(),
       ...this.markdownErrorLines(),
+      ...this.markdownReportsLines(),
       ``
     ].join('\n')
   }
@@ -127,7 +134,7 @@ export class Status {
    * @returns lines of markdown content showing commit information
    */
   private markdownCommitLines(): string[] {
-    return [`- Commit: \`${this.sha}\``]
+    return [`- Commit: ${this.sha}`]
   }
 
   /**
@@ -155,6 +162,28 @@ export class Status {
   }
 
   /**
+   * @returns lines of markdown content showing reports information
+   */
+  private markdownReportsLines(): string[] {
+    if (this.reports.size === 0) {
+      return []
+    } else {
+      const table = [
+        ``,
+        `| Report | Classes | Methods | Tests |`,
+        `|:-------|--------:|--------:|------:|`
+      ]
+      for (const [name, report] of this.reports) {
+        table.push(
+          `| ${name} | ${report.summary.classesCount} | ${report.summary.methodsCount} | ${report.summary.completeTestCount} |`
+        )
+      }
+      table.push(``)
+      return table
+    }
+  }
+
+  /**
    * @returns lines of markdown content showing work in progress information
    */
   private markdownWorkInProgressLines(): string[] {
@@ -167,4 +196,22 @@ export class Status {
       return []
     }
   }
+}
+
+/** Model classes of just enough of a `./diffblue/reports/report.json` to summarise */
+export class Report {
+  meta = new ReportMeta()
+  run = new ReportRun()
+  summary = new ReportSummary()
+}
+class ReportMeta {
+  reportVersion = '2.5'
+}
+class ReportRun {
+  totalTime = 0
+}
+class ReportSummary {
+  classesCount = 0
+  methodsCount = 0
+  completeTestCount = 0
 }
