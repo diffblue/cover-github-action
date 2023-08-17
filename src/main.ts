@@ -1,5 +1,6 @@
 import * as core from '@actions/core'
 import * as exec from '@actions/exec'
+import * as git from './git'
 import {skip} from './skip'
 import {installLatestVersion} from './install-latest-version'
 import {upload} from './upload'
@@ -13,6 +14,8 @@ async function run(): Promise<void> {
 
   const status = await readStatus()
   try {
+    await git.prepare(status)
+
     core.startGroup('Install Diffblue Cover')
     await installLatestVersion(status)
     await exec.exec('dcover', ['--version'])
@@ -36,7 +39,7 @@ async function run(): Promise<void> {
     if (error instanceof Error) {
       core.setFailed(error.message)
       if (error.stack) {
-        core.error(error.stack)
+        core.info(error.stack)
       }
     }
   }

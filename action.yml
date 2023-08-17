@@ -5,6 +5,12 @@ inputs:
   license-key:
     required: true
     description: The license key provided in your welcome email or provided by your organization
+  user-name:
+    required: true
+    description: The name of the commit author, used to configure the git `user.name`.
+  user-email:
+    required: true
+    description: The email address of the commit author, used to configure the git `user.name`.
   topic-id-differentiator:
     required: false
     description: Optional string to differentiate multiple uses of the actions within a single workflow.

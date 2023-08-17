@@ -1,6 +1,82 @@
 require('./sourcemap-register.js');/******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
+/***/ 3374:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.prepare = void 0;
+const core = __importStar(__nccwpck_require__(2186));
+const exec = __importStar(__nccwpck_require__(1514));
+/**
+ * Runs various `git` subcommands in order to prepare the workspace
+ * for committing and pushing refactorings and tests.
+ *
+ * @param status the status to be updated and saved.
+ */
+function prepare(status) {
+    return __awaiter(this, void 0, void 0, function* () {
+        core.startGroup('Prepare');
+        core.info('Preparing git clone for committing and pushing tests.');
+        const missing = [];
+        const name = core.getInput('user-name');
+        if (!name) {
+            missing.push(`'user-name'`);
+        }
+        const email = core.getInput('user-email');
+        if (!email) {
+            missing.push(`'user-email'`);
+        }
+        if (missing.length > 0) {
+            throw new Error(`Unable to prepare git workspace due to missing configuration: ${missing.join(', ')}`);
+        }
+        yield exec.exec('git', ['remote', '--verbose']);
+        yield exec.exec('git', ['config', 'user.name', name]);
+        yield exec.exec('git', ['config', 'user.email', email]);
+        yield exec.exec('git', ['fetch', 'origin', status.ref, '--deepen', '10']);
+        yield exec.exec('git', ['checkout', status.sha]);
+        core.endGroup();
+    });
+}
+exports.prepare = prepare;
+
+
+/***/ }),
+
 /***/ 994:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -179,6 +255,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(2186));
 const exec = __importStar(__nccwpck_require__(1514));
+const git = __importStar(__nccwpck_require__(3374));
 const skip_1 = __nccwpck_require__(8830);
 const install_latest_version_1 = __nccwpck_require__(994);
 const upload_1 = __nccwpck_require__(4831);
@@ -191,6 +268,7 @@ function run() {
         }
         const status = yield (0, status_io_1.readStatus)();
         try {
+            yield git.prepare(status);
             core.startGroup('Install Diffblue Cover');
             yield (0, install_latest_version_1.installLatestVersion)(status);
             yield exec.exec('dcover', ['--version']);
@@ -211,7 +289,7 @@ function run() {
             if (error instanceof Error) {
                 core.setFailed(error.message);
                 if (error.stack) {
-                    core.error(error.stack);
+                    core.info(error.stack);
                 }
             }
         }
@@ -262,15 +340,18 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.skipDependabot = exports.skipEventType = exports.skip = void 0;
+exports.skipOwnCommits = exports.skipDependabot = exports.skipEventType = exports.skip = void 0;
 const core = __importStar(__nccwpck_require__(2186));
 const github = __importStar(__nccwpck_require__(5438));
+const action_1 = __nccwpck_require__(1231);
 /**
  * @returns `true` iff the action should be skipped for any reason
  */
 function skip() {
     return __awaiter(this, void 0, void 0, function* () {
-        return (yield skipEventType()) || (yield skipDependabot());
+        return ((yield skipEventType()) ||
+            (yield skipDependabot()) ||
+            (yield skipOwnCommits()));
     });
 }
 exports.skip = skip;
@@ -302,6 +383,61 @@ function skipDependabot() {
     });
 }
 exports.skipDependabot = skipDependabot;
+/**
+ * @returns `true` iff the head commit was authored by the configured user and email
+ */
+function skipOwnCommits() {
+    return __awaiter(this, void 0, void 0, function* () {
+        const config = yield configuredAuthor();
+        const author = yield headCommitAuthor();
+        const result = config !== undefined && author !== undefined && config === author;
+        core.info(`COMPARISON C${config}C===A${author}A => ${result}`);
+        if (result) {
+            core.info(`Skipping commits authored by: ${author}`);
+        }
+        return result;
+    });
+}
+exports.skipOwnCommits = skipOwnCommits;
+/**
+ * @returns the name and email address of the configured commit author, if configured.
+ */
+function configuredAuthor() {
+    return __awaiter(this, void 0, void 0, function* () {
+        const configName = core.getInput('user-name');
+        const configEmail = core.getInput('user-email');
+        if (configName !== '' && configEmail !== '') {
+            return `${configName} <${configEmail}>`;
+        }
+        else {
+            return undefined;
+        }
+    });
+}
+/**
+ * @returns the name and email address of the HEAD commit author, if known.
+ */
+function headCommitAuthor() {
+    var _a, _b, _c, _d;
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const sha = ((_b = (_a = github.context.payload.pull_request) === null || _a === void 0 ? void 0 : _a.head) === null || _b === void 0 ? void 0 : _b.sha) || '';
+            const [owner, repo] = process.env.GITHUB_REPOSITORY.split('/');
+            const octokit = new action_1.Octokit();
+            const commit = yield octokit.rest.repos.getCommit({
+                owner,
+                repo,
+                ref: sha
+            });
+            const authorName = (_c = commit.data.commit.author) === null || _c === void 0 ? void 0 : _c.name;
+            const authorEmail = (_d = commit.data.commit.author) === null || _d === void 0 ? void 0 : _d.email;
+            return `${authorName} <${authorEmail}>`;
+        }
+        catch (error) {
+            return undefined;
+        }
+    });
+}
 
 
 /***/ }),
@@ -379,7 +515,7 @@ function readStatus() {
             if (error instanceof Error) {
                 core.setFailed(error.message);
                 if (error.stack) {
-                    core.error(error.stack);
+                    core.info(error.stack);
                 }
             }
         }
@@ -406,7 +542,7 @@ function saveStatus(status) {
             if (error instanceof Error) {
                 core.setFailed(error.message);
                 if (error.stack) {
-                    core.error(error.stack);
+                    core.info(error.stack);
                 }
             }
         }
@@ -450,7 +586,7 @@ function createOrUpdateComment(octokit, status) {
             if (error instanceof Error) {
                 core.setFailed(error.message);
                 if (error.stack) {
-                    core.error(error.stack);
+                    core.info(error.stack);
                 }
             }
         }
@@ -580,7 +716,7 @@ function hideOutdatedComment(octokit, comment) {
             if (error instanceof Error) {
                 core.setFailed(error.message);
                 if (error.stack) {
-                    core.error(error.stack);
+                    core.info(error.stack);
                 }
             }
         }
@@ -624,7 +760,7 @@ const core = __importStar(__nccwpck_require__(2186));
 const github = __importStar(__nccwpck_require__(5438));
 class Status {
     constructor() {
-        var _a, _b, _c;
+        var _a, _b, _c, _d, _e;
         /** `true` iff the status is being actively worked on */
         this.work_in_progress = true;
         const [owner, repo] = process.env.GITHUB_REPOSITORY.split('/');
@@ -645,7 +781,8 @@ class Status {
         this.run_link_title = `${this.workflow} / ${this.job} ${differentiator}`;
         this.run_link_url = `${process.env.GITHUB_SERVER_URL}/${owner}/${repo}/actions/runs/${process.env.GITHUB_RUN_ID}/attempts/${process.env.GITHUB_RUN_ATTEMPT}`;
         this.sha = ((_b = (_a = github.context.payload.pull_request) === null || _a === void 0 ? void 0 : _a.head) === null || _b === void 0 ? void 0 : _b.sha) || '';
-        this.issue_number = ((_c = github.context.payload.pull_request) === null || _c === void 0 ? void 0 : _c.number) || 0;
+        this.ref = ((_d = (_c = github.context.payload.pull_request) === null || _c === void 0 ? void 0 : _c.head) === null || _d === void 0 ? void 0 : _d.ref) || '';
+        this.issue_number = ((_e = github.context.payload.pull_request) === null || _e === void 0 ? void 0 : _e.number) || 0;
     }
     /**
      * @returns this status rendered to markdown for use in a pull request comment

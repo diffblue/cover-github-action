@@ -34,7 +34,7 @@ export async function readStatus(): Promise<Status> {
     if (error instanceof Error) {
       core.setFailed(error.message)
       if (error.stack) {
-        core.error(error.stack)
+        core.info(error.stack)
       }
     }
   }
@@ -60,7 +60,7 @@ export async function saveStatus(status: Status): Promise<void> {
     if (error instanceof Error) {
       core.setFailed(error.message)
       if (error.stack) {
-        core.error(error.stack)
+        core.info(error.stack)
       }
     }
   }
@@ -103,7 +103,7 @@ async function createOrUpdateComment(
     if (error instanceof Error) {
       core.setFailed(error.message)
       if (error.stack) {
-        core.error(error.stack)
+        core.info(error.stack)
       }
     }
   }
@@ -237,7 +237,7 @@ async function hideOutdatedComment(
     if (error instanceof Error) {
       core.setFailed(error.message)
       if (error.stack) {
-        core.error(error.stack)
+        core.info(error.stack)
       }
     }
   }

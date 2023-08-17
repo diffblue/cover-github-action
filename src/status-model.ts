@@ -40,6 +40,9 @@ export class Status {
   /** The sha of the latest commit to the pull request */
   sha: string
 
+  /** The ref of the latest commit to the pull request */
+  ref: string
+
   /** The pull request issue number */
   issue_number: number
 
@@ -75,6 +78,7 @@ export class Status {
     this.run_link_url = `${process.env.GITHUB_SERVER_URL}/${owner}/${repo}/actions/runs/${process.env.GITHUB_RUN_ID}/attempts/${process.env.GITHUB_RUN_ATTEMPT}`
 
     this.sha = github.context.payload.pull_request?.head?.sha || ''
+    this.ref = github.context.payload.pull_request?.head?.ref || ''
     this.issue_number = github.context.payload.pull_request?.number || 0
   }
 
