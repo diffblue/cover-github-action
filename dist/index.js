@@ -152,11 +152,13 @@ function create(status) {
         const reportFiles = yield globber.glob();
         for (const reportFile of reportFiles) {
             const report = JSON.parse((0, fs_1.readFileSync)(reportFile, 'utf8'));
-            let reportName = reportFile.substring(0, reportFile.length - '/.diffblue/reports/report.json'.length);
+            let reportName = reportFile;
             if (reportName.startsWith(process.env.GITHUB_WORKSPACE)) {
                 reportName = reportName.substring(process.env.GITHUB_WORKSPACE.length);
             }
-            reportName = reportName.replace('\\', '/');
+            reportName = reportName.substring(0, reportName.length - '/.diffblue/reports/report.json'.length);
+            reportName = reportName.replace(/\\/g, '/');
+            reportName = reportName.replace(/^\/+/g, '');
             if (reportName === '' || reportName === '/') {
                 reportName = '(root module)';
             }
