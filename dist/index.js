@@ -39,7 +39,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.prepare = void 0;
+exports.push = exports.prepare = void 0;
 const core = __importStar(__nccwpck_require__(2186));
 const exec = __importStar(__nccwpck_require__(1514));
 /**
@@ -73,6 +73,19 @@ function prepare(status) {
     });
 }
 exports.prepare = prepare;
+/**
+ * Runs `git push` to push changes up.
+ *
+ * @param status the status to be updated and saved.
+ */
+function push(status) {
+    return __awaiter(this, void 0, void 0, function* () {
+        core.startGroup('Push');
+        yield exec.exec('git', ['push', 'origin', `HEAD:${status.ref}`]);
+        core.endGroup();
+    });
+}
+exports.push = push;
 
 
 /***/ }),
@@ -283,6 +296,7 @@ function run() {
             }
             yield exec.exec('dcover', ['activate', keyValue]);
             core.endGroup();
+            yield git.push(status);
         }
         catch (error) {
             status.error = error;
