@@ -51,12 +51,9 @@ export async function skipOwnCommits(): Promise<boolean> {
   const author = await headCommitAuthor()
   const result =
     config !== undefined && author !== undefined && config === author
-
-  core.info(`COMPARISON C${config}C===A${author}A => ${result}`)
   if (result) {
     core.info(`Skipping commits authored by: ${author}`)
   }
-
   return result
 }
 
