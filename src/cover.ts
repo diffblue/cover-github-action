@@ -3,8 +3,15 @@ import * as core from '@actions/core'
 import * as exec from '@actions/exec'
 import * as git from './git'
 import {installLatestVersion} from './install-latest-version'
-import {Status} from './status-model'
+import {Report, Status} from './status-model'
 import {saveStatus} from './status-io'
+import {readFileSync} from 'fs'
+
+declare let process: {
+  env: {
+    GITHUB_WORKSPACE: string
+  }
+}
 
 /**
  * Installs `dcover` for use by other commands and functions.
@@ -98,6 +105,27 @@ export async function create(status: Status): Promise<void> {
     ...extraArgs('create-args')
   ])
   await git.commit(status, 'Added tests created with Diffblue Cover')
+
+  const globber = await glob.create('**/.diffblue/reports/report.json')
+  const reportFiles: string[] = await globber.glob()
+  for (const reportFile of reportFiles) {
+    const report = JSON.parse(readFileSync(reportFile, 'utf8')) as Report
+    let reportName = reportFile
+    if (reportName.startsWith(process.env.GITHUB_WORKSPACE)) {
+      reportName = reportName.substring(process.env.GITHUB_WORKSPACE.length)
+    }
+    reportName = reportName.substring(
+      0,
+      reportName.length - '/.diffblue/reports/report.json'.length
+    )
+    reportName = reportName.replace(/\\/g, '/')
+    reportName = reportName.replace(/^\/+/g, '')
+    if (reportName === '' || reportName === '/') {
+      reportName = '(root module)'
+    }
+    status.reports.set(reportName, report)
+  }
+  saveStatus(status)
   core.endGroup()
 }
 
