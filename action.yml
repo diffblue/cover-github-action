@@ -11,6 +11,12 @@ inputs:
   user-email:
     required: true
     description: The email address of the commit author, used to configure the git `user.name`.
+  working-directory:
+    required: false
+    description: The working directory to pass to `dcover` comamnds that accept a `--working-directory` argument.
+  create-args:
+    required: false
+    description: Additional command line arguments for the `dcover create` command.
   topic-id-differentiator:
     required: false
     description: Optional string to differentiate multiple uses of the actions within a single workflow.
