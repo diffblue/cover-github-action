@@ -1,8 +1,8 @@
 import * as core from '@actions/core'
 import * as exec from '@actions/exec'
 import * as git from './git'
+import * as cover from './cover'
 import {skip} from './skip'
-import {installLatestVersion} from './install-latest-version'
 import {upload} from './upload'
 import {summary} from './summary'
 import {readStatus} from './status-io'
@@ -15,11 +15,9 @@ async function run(): Promise<void> {
   const status = await readStatus()
   try {
     await git.prepare(status)
+    await cover.install(status)
 
-    core.startGroup('Install Diffblue Cover')
-    await installLatestVersion(status)
-    await exec.exec('dcover', ['--version'])
-
+    core.startGroup('Activate')
     const keyName = 'license-key'
     const keyValue: string = core.getInput(keyName)
     if (keyValue === '') {
