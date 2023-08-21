@@ -39,7 +39,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.cleanup = exports.create = exports.fixBuild = exports.fixBuildIfNeeded = exports.createPreFlight = exports.activate = exports.install = void 0;
+exports.cleanup = exports.create = exports.createPreFlight = exports.activate = exports.install = void 0;
 const glob = __importStar(__nccwpck_require__(8090));
 const core = __importStar(__nccwpck_require__(2186));
 const exec = __importStar(__nccwpck_require__(1514));
@@ -85,55 +85,26 @@ function activate() {
 exports.activate = activate;
 /**
  * Runs `dcover create --pre-flight`.
+ * Additionally uses `--fix-build` and commits any resulting fixes.
+ *
+ * @param status the status to be updated and saved.
  */
-function createPreFlight() {
+function createPreFlight(status) {
     return __awaiter(this, void 0, void 0, function* () {
         core.startGroup('Create (pre-flight)');
         yield exec.exec('dcover', [
             'create',
             '--batch',
             '--pre-flight',
+            '--fix-build',
             ...workingDirectoryArgs(),
             ...extraArgs('create-args')
-        ]);
-        core.endGroup();
-    });
-}
-exports.createPreFlight = createPreFlight;
-/**
- * Runs `dcover fix-build`, if a `.diffblue/refactorings.yml` is found.
- *
- * @param status the status to be updated and saved.
- */
-function fixBuildIfNeeded(status) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const globber = yield glob.create('**/.diffblue/refactorings.yml');
-        const refactorings = yield globber.glob();
-        if (refactorings) {
-            yield fixBuild(status);
-        }
-    });
-}
-exports.fixBuildIfNeeded = fixBuildIfNeeded;
-/**
- * Runs `dcover fix-build`.
- *
- * @param status the status to be updated and saved.
- */
-function fixBuild(status) {
-    return __awaiter(this, void 0, void 0, function* () {
-        core.startGroup('Fix build');
-        yield exec.exec('dcover', [
-            'fix-build',
-            '--batch',
-            ...workingDirectoryArgs(),
-            ...extraArgs('refactor-args')
         ]);
         yield git.commit(status, 'Fixed build for use with Diffblue Cover');
         core.endGroup();
     });
 }
-exports.fixBuild = fixBuild;
+exports.createPreFlight = createPreFlight;
 /**
  * Runs `dcover create`.
  *
@@ -574,8 +545,7 @@ function run() {
             yield git.prepare(status);
             yield cover.install(status);
             yield cover.activate();
-            yield cover.createPreFlight();
-            yield cover.fixBuildIfNeeded(status);
+            yield cover.createPreFlight(status);
             yield cover.create(status);
             yield git.push(status);
         }
