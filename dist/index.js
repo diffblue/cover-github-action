@@ -39,7 +39,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.cleanup = exports.create = exports.createPreFlight = exports.activate = exports.install = void 0;
+exports.cleanup = exports.create = exports.createPreFlight = exports.validate = exports.clean = exports.activate = exports.install = void 0;
 const glob = __importStar(__nccwpck_require__(8090));
 const core = __importStar(__nccwpck_require__(2186));
 const exec = __importStar(__nccwpck_require__(1514));
@@ -83,6 +83,44 @@ function activate() {
     });
 }
 exports.activate = activate;
+/**
+ * Runs `dcover clean`.
+ *
+ * @param status the status to be updated and saved.
+ */
+function clean(status) {
+    return __awaiter(this, void 0, void 0, function* () {
+        core.startGroup('Clean');
+        yield exec.exec('dcover', [
+            'clean',
+            '--batch',
+            ...workingDirectoryArgs(),
+            ...extraArgs('clean-args')
+        ]);
+        yield git.commit(status, 'Removed non-compiling Diffblue tests');
+        core.endGroup();
+    });
+}
+exports.clean = clean;
+/**
+ * Runs `dcover validate`.
+ *
+ * @param status the status to be updated and saved.
+ */
+function validate(status) {
+    return __awaiter(this, void 0, void 0, function* () {
+        core.startGroup('Validate');
+        yield exec.exec('dcover', [
+            'validate',
+            '--batch',
+            ...workingDirectoryArgs(),
+            ...extraArgs('validate-args')
+        ]);
+        yield git.commit(status, 'Removed failing Diffblue tests');
+        core.endGroup();
+    });
+}
+exports.validate = validate;
 /**
  * Runs `dcover create --pre-flight`.
  * Additionally uses `--fix-build` and commits any resulting fixes.
@@ -545,6 +583,8 @@ function run() {
             yield git.prepare(status);
             yield cover.install(status);
             yield cover.activate();
+            yield cover.clean(status);
+            yield cover.validate(status);
             yield cover.createPreFlight(status);
             yield cover.create(status);
             yield git.push(status);
