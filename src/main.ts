@@ -30,6 +30,7 @@ async function run(): Promise<void> {
     }
   }
 
+  await cover.cleanup()
   await upload(status)
   await summary(status)
 }

@@ -2,6 +2,7 @@ import * as glob from '@actions/glob'
 import * as core from '@actions/core'
 import * as exec from '@actions/exec'
 import * as git from './git'
+import * as gradle from './gradle'
 import {installLatestVersion} from './install-latest-version'
 import {Report, Status} from './status-model'
 import {saveStatus} from './status-io'
@@ -126,6 +127,15 @@ export async function create(status: Status): Promise<void> {
     status.reports.set(reportName, report)
   }
   saveStatus(status)
+  core.endGroup()
+}
+
+/**
+ * Cleanup after `dcover` use.
+ */
+export async function cleanup(): Promise<void> {
+  core.startGroup('Cleanup')
+  await gradle.stop()
   core.endGroup()
 }
 
