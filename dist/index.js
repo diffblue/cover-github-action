@@ -1,7 +1,90 @@
 require('./sourcemap-register.js');/******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
-/***/ 8060:
+/***/ 9139:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const core = __importStar(__nccwpck_require__(2186));
+const git = __importStar(__nccwpck_require__(9147));
+const cover = __importStar(__nccwpck_require__(2362));
+const skip_1 = __nccwpck_require__(11);
+const upload_1 = __nccwpck_require__(4084);
+const summary_1 = __nccwpck_require__(6063);
+const status_io_1 = __nccwpck_require__(5973);
+/**
+ * Runs the "batteries included" combined action.
+ */
+function run() {
+    return __awaiter(this, void 0, void 0, function* () {
+        if (yield (0, skip_1.skip)()) {
+            return;
+        }
+        const status = yield (0, status_io_1.readStatus)();
+        try {
+            yield git.prepare(status);
+            yield cover.install(status);
+            yield cover.activate();
+            yield cover.clean(status);
+            yield cover.validate(status);
+            yield cover.createPreFlight(status);
+            yield cover.create(status);
+            yield git.push(status);
+        }
+        catch (error) {
+            status.error = error;
+            if (error instanceof Error) {
+                core.setFailed(error.message);
+                if (error.stack) {
+                    core.info(error.stack);
+                }
+            }
+        }
+        yield cover.cleanup();
+        yield (0, upload_1.upload)(status);
+        yield (0, summary_1.summary)(status);
+    });
+}
+run();
+
+
+/***/ }),
+
+/***/ 2362:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -43,10 +126,10 @@ exports.cleanup = exports.create = exports.createPreFlight = exports.validate = 
 const glob = __importStar(__nccwpck_require__(8090));
 const core = __importStar(__nccwpck_require__(2186));
 const exec = __importStar(__nccwpck_require__(1514));
-const git = __importStar(__nccwpck_require__(3374));
-const gradle = __importStar(__nccwpck_require__(0));
-const install_latest_version_1 = __nccwpck_require__(994);
-const status_io_1 = __nccwpck_require__(2199);
+const git = __importStar(__nccwpck_require__(9147));
+const gradle = __importStar(__nccwpck_require__(4959));
+const install_latest_version_1 = __nccwpck_require__(8292);
+const status_io_1 = __nccwpck_require__(5973);
 const fs_1 = __nccwpck_require__(7147);
 /**
  * Installs `dcover` for use by other commands and functions.
@@ -216,7 +299,7 @@ function extraArgs(input) {
 
 /***/ }),
 
-/***/ 3374:
+/***/ 9147:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -329,7 +412,7 @@ exports.push = push;
 
 /***/ }),
 
-/***/ 0:
+/***/ 4959:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -390,7 +473,7 @@ exports.stop = stop;
 
 /***/ }),
 
-/***/ 994:
+/***/ 8292:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -432,7 +515,7 @@ exports.installLatestVersion = void 0;
 const core = __importStar(__nccwpck_require__(2186));
 const io = __importStar(__nccwpck_require__(7436));
 const tool = __importStar(__nccwpck_require__(7784));
-const lookup_latest_version_1 = __nccwpck_require__(6575);
+const lookup_latest_version_1 = __nccwpck_require__(4390);
 function installLatestVersion(status) {
     return __awaiter(this, void 0, void 0, function* () {
         const { name, version, url } = yield (0, lookup_latest_version_1.lookupLatestVersion)();
@@ -454,7 +537,7 @@ exports.installLatestVersion = installLatestVersion;
 
 /***/ }),
 
-/***/ 6575:
+/***/ 4390:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -528,87 +611,7 @@ exports.lookupLatestVersion = lookupLatestVersion;
 
 /***/ }),
 
-/***/ 3109:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-const core = __importStar(__nccwpck_require__(2186));
-const git = __importStar(__nccwpck_require__(3374));
-const cover = __importStar(__nccwpck_require__(8060));
-const skip_1 = __nccwpck_require__(8830);
-const upload_1 = __nccwpck_require__(4831);
-const summary_1 = __nccwpck_require__(8608);
-const status_io_1 = __nccwpck_require__(2199);
-function run() {
-    return __awaiter(this, void 0, void 0, function* () {
-        if (yield (0, skip_1.skip)()) {
-            return;
-        }
-        const status = yield (0, status_io_1.readStatus)();
-        try {
-            yield git.prepare(status);
-            yield cover.install(status);
-            yield cover.activate();
-            yield cover.clean(status);
-            yield cover.validate(status);
-            yield cover.createPreFlight(status);
-            yield cover.create(status);
-            yield git.push(status);
-        }
-        catch (error) {
-            status.error = error;
-            if (error instanceof Error) {
-                core.setFailed(error.message);
-                if (error.stack) {
-                    core.info(error.stack);
-                }
-            }
-        }
-        yield cover.cleanup();
-        yield (0, upload_1.upload)(status);
-        yield (0, summary_1.summary)(status);
-    });
-}
-run();
-
-
-/***/ }),
-
-/***/ 8830:
+/***/ 11:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -747,7 +750,7 @@ function headCommitAuthor() {
 
 /***/ }),
 
-/***/ 2199:
+/***/ 5973:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -790,7 +793,8 @@ const io = __importStar(__nccwpck_require__(7436));
 const core = __importStar(__nccwpck_require__(2186));
 const action_1 = __nccwpck_require__(1231);
 const fs_1 = __nccwpck_require__(7147);
-const status_model_1 = __nccwpck_require__(2437);
+const status_model_1 = __nccwpck_require__(2023);
+const status_md_1 = __nccwpck_require__(2651);
 /** The directory where the status files should be written. */
 const dir = '.diffblue';
 /** The file where the status markdown should be written. */
@@ -836,7 +840,7 @@ function saveStatus(status) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             yield io.mkdirP(dir);
-            (0, fs_1.writeFileSync)(markdownFile, status.comment(), { flag: 'w' });
+            (0, fs_1.writeFileSync)(markdownFile, (0, status_md_1.markdownComment)(status), { flag: 'w' });
             (0, fs_1.writeFileSync)(jsonFile, JSON.stringify(status, undefined, '  '), {
                 flag: 'w'
             });
@@ -867,7 +871,7 @@ function createOrUpdateComment(octokit, status) {
                     owner: status.owner,
                     repo: status.repo,
                     comment_id: status.comment_id,
-                    body: status.comment()
+                    body: (0, status_md_1.markdownComment)(status)
                 });
                 core.debug(`Updated Comment: ${resp.data.html_url}`);
             }
@@ -876,7 +880,7 @@ function createOrUpdateComment(octokit, status) {
                     owner: status.owner,
                     repo: status.repo,
                     issue_number: status.issue_number,
-                    body: status.comment()
+                    body: (0, status_md_1.markdownComment)(status)
                 });
                 status.comment_id = response.data.id;
                 yield io.mkdirP(dir);
@@ -1031,7 +1035,134 @@ function hideOutdatedComment(octokit, comment) {
 
 /***/ }),
 
-/***/ 2437:
+/***/ 2651:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.markdownSummary = exports.markdownComment = void 0;
+/**
+ * @param status the status to render as markdown
+ * @returns this status rendered to markdown for use in a pull request comment
+ */
+function markdownComment(status) {
+    return [
+        ...markdownHeaderLines(status),
+        ...markdownRunLines(status),
+        ...markdownCommitLines(status),
+        ...markdownVersionLines(status),
+        ...markdownErrorLines(status),
+        ...markdownReportsLines(status),
+        ...markdownWorkInProgressLines(status),
+        ``
+    ].join('\n');
+}
+exports.markdownComment = markdownComment;
+/**
+ * @param status the status to render as markdown
+ * @returns this status rendered to markdown for use in a job summary
+ */
+function markdownSummary(status) {
+    return [
+        ...markdownHeaderLines(status),
+        ...markdownVersionLines(status),
+        ...markdownErrorLines(status),
+        ...markdownReportsLines(status),
+        ``
+    ].join('\n');
+}
+exports.markdownSummary = markdownSummary;
+/**
+ * @param status the status to render as markdown
+ * @returns lines of markdown heading content
+ */
+function markdownHeaderLines(status) {
+    return [`<!-- Topic: ${status.topic_slug} -->`, `### Diffblue Cover`, ``];
+}
+/**
+ * @param status the status to render as markdown
+ * @returns lines of markdown content showing run information
+ */
+function markdownRunLines(status) {
+    return [`- Run: [${status.run_link_title}](${status.run_link_url})`];
+}
+/**
+ * @param status the status to render as markdown
+ * @returns lines of markdown content showing commit information
+ */
+function markdownCommitLines(status) {
+    return [`- Commit: ${status.sha}`];
+}
+/**
+ * @param status the status to render as markdown
+ * @returns lines of markdown content showing version information
+ */
+function markdownVersionLines(status) {
+    if (status.version) {
+        return [`- Version: ${status.version}`];
+    }
+    else {
+        return [];
+    }
+}
+/**
+ * @param status the status to render as markdown
+ * @returns lines of markdown content showing error information
+ */
+function markdownErrorLines(status) {
+    if (status.error instanceof Error) {
+        return [`- Error: \`${status.error.message}\` :exclamation:`];
+    }
+    else if (status.error) {
+        return [`- Error: \`${status.error}\` :exclamation:`];
+    }
+    else {
+        return [];
+    }
+}
+/**
+ * @param status the status to render as markdown
+ * @returns lines of markdown content showing reports information
+ */
+function markdownReportsLines(status) {
+    if (status.reports.size === 0) {
+        return [];
+    }
+    else {
+        const table = [
+            ``,
+            `| Report | Classes | Methods | Tests |`,
+            `|:-------|--------:|--------:|------:|`
+        ];
+        for (const name of Object.keys(status.reports)) {
+            const report = status.reports.get(name) || {};
+            table.push(`| ${name} | ${report.summary.classesCount} | ${report.summary.methodsCount} | ${report.summary.completeTestCount} |`);
+        }
+        table.push(``);
+        return table;
+    }
+}
+/**
+ * @param status the status to render as markdown
+ * @returns lines of markdown content showing work in progress information
+ */
+function markdownWorkInProgressLines(status) {
+    if (status.work_in_progress) {
+        return [
+            ``,
+            `:construction: _This comment is under construction and will be updated on completion._ :construction: `
+        ];
+    }
+    else {
+        return [];
+    }
+}
+
+
+/***/ }),
+
+/***/ 2023:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -1093,110 +1224,6 @@ class Status {
         this.ref = ((_d = (_c = github.context.payload.pull_request) === null || _c === void 0 ? void 0 : _c.head) === null || _d === void 0 ? void 0 : _d.ref) || '';
         this.issue_number = ((_e = github.context.payload.pull_request) === null || _e === void 0 ? void 0 : _e.number) || 0;
     }
-    /**
-     * @returns this status rendered to markdown for use in a pull request comment
-     */
-    comment() {
-        return [
-            ...this.markdownHeaderLines(),
-            ...this.markdownRunLines(),
-            ...this.markdownCommitLines(),
-            ...this.markdownVersionLines(),
-            ...this.markdownErrorLines(),
-            ...this.markdownReportsLines(),
-            ...this.markdownWorkInProgressLines(),
-            ``
-        ].join('\n');
-    }
-    /**
-     * @returns this status rendered to markdown for use in a job summary
-     */
-    summary() {
-        return [
-            ...this.markdownHeaderLines(),
-            ...this.markdownVersionLines(),
-            ...this.markdownErrorLines(),
-            ...this.markdownReportsLines(),
-            ``
-        ].join('\n');
-    }
-    /**
-     * @returns lines of markdown heading content
-     */
-    markdownHeaderLines() {
-        return [`<!-- Topic: ${this.topic_slug} -->`, `### Diffblue Cover`, ``];
-    }
-    /**
-     * @returns lines of markdown content showing run information
-     */
-    markdownRunLines() {
-        return [`- Run: [${this.run_link_title}](${this.run_link_url})`];
-    }
-    /**
-     * @returns lines of markdown content showing commit information
-     */
-    markdownCommitLines() {
-        return [`- Commit: ${this.sha}`];
-    }
-    /**
-     * @returns lines of markdown content showing version information
-     */
-    markdownVersionLines() {
-        if (this.version) {
-            return [`- Version: ${this.version}`];
-        }
-        else {
-            return [];
-        }
-    }
-    /**
-     * @returns lines of markdown content showing error information
-     */
-    markdownErrorLines() {
-        if (this.error instanceof Error) {
-            return [`- Error: \`${this.error.message}\` :exclamation:`];
-        }
-        else if (this.error) {
-            return [`- Error: \`${this.error}\` :exclamation:`];
-        }
-        else {
-            return [];
-        }
-    }
-    /**
-     * @returns lines of markdown content showing reports information
-     */
-    markdownReportsLines() {
-        if (this.reports.size === 0) {
-            return [];
-        }
-        else {
-            const table = [
-                ``,
-                `| Report | Classes | Methods | Tests |`,
-                `|:-------|--------:|--------:|------:|`
-            ];
-            for (const [name, report] of this.reports) {
-                table.push(`| ${name} | ${report.summary.classesCount} | ${report.summary.methodsCount} | ${report.summary.completeTestCount} |`);
-            }
-            table.push(``);
-            return table;
-        }
-    }
-    /**
-     * @returns lines of markdown content showing work in progress information
-     */
-    markdownWorkInProgressLines() {
-        if (this.work_in_progress) {
-            return [
-                ``,
-                `:construction: _This comment is under construction and will be updated on completion._ :construction: `
-            ];
-        }
-        else {
-            return [];
-        }
-    }
 }
 exports.Status = Status;
 /** Model classes of just enough of a `./diffblue/reports/report.json` to summarise */
@@ -1229,7 +1256,7 @@ class ReportSummary {
 
 /***/ }),
 
-/***/ 8608:
+/***/ 6063:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -1269,7 +1296,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.summary = void 0;
 const core = __importStar(__nccwpck_require__(2186));
-const status_io_1 = __nccwpck_require__(2199);
+const status_io_1 = __nccwpck_require__(5973);
+const status_md_1 = __nccwpck_require__(2651);
 /**
  * @param status the status to be summarised and saved.
  */
@@ -1277,7 +1305,7 @@ function summary(status) {
     return __awaiter(this, void 0, void 0, function* () {
         status.work_in_progress = false;
         yield (0, status_io_1.saveStatus)(status);
-        yield core.summary.addRaw(status.summary()).write();
+        yield core.summary.addRaw((0, status_md_1.markdownSummary)(status)).write();
     });
 }
 exports.summary = summary;
@@ -1285,7 +1313,7 @@ exports.summary = summary;
 
 /***/ }),
 
-/***/ 4831:
+/***/ 4084:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -22024,7 +22052,7 @@ module.exports.win32 = win32;
 
 /***/ }),
 
-/***/ 4959:
+/***/ 6869:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 const assert = __nccwpck_require__(9491)
@@ -24346,7 +24374,7 @@ const os = __nccwpck_require__(2037);
 const path = __nccwpck_require__(1017);
 const crypto = __nccwpck_require__(6113);
 const _c = { fs: fs.constants, os: os.constants };
-const rimraf = __nccwpck_require__(4959);
+const rimraf = __nccwpck_require__(6869);
 
 /*
  * The working inner variables.
@@ -49306,7 +49334,7 @@ module.exports = JSON.parse('[[[0,44],"disallowed_STD3_valid"],[[45,46],"valid"]
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __nccwpck_require__(3109);
+/******/ 	var __webpack_exports__ = __nccwpck_require__(9139);
 /******/ 	module.exports = __webpack_exports__;
 /******/ 	
 /******/ })()
