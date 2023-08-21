@@ -1,10 +1,10 @@
 import * as core from '@actions/core'
-import * as git from './git'
-import * as cover from './cover'
-import {skip} from './skip'
-import {upload} from './upload'
-import {summary} from './summary'
-import {readStatus} from './status-io'
+import * as git from './internal/git'
+import * as cover from './internal/cover'
+import {skip} from './internal/skip'
+import {upload} from './internal/upload'
+import {summary} from './internal/summary'
+import {readStatus} from './internal/status-io'
 
 async function run(): Promise<void> {
   if (await skip()) {

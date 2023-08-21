@@ -1,6 +1,6 @@
 import {HttpClient, HttpClientResponse} from '@actions/http-client'
 
-import {lookupLatestVersion} from '../src/lookup-latest-version'
+import {lookupLatestVersion} from '../src/internal/lookup-latest-version'
 import {expect, test} from '@jest/globals'
 import {IncomingHttpHeaders} from 'http'
 
