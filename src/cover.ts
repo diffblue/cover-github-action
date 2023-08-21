@@ -48,6 +48,23 @@ export async function activate(): Promise<void> {
 }
 
 /**
+ * Runs `dcover validate`.
+ *
+ * @param status the status to be updated and saved.
+ */
+export async function validate(status: Status): Promise<void> {
+  core.startGroup('Validate')
+  await exec.exec('dcover', [
+    'validate',
+    '--batch',
+    ...workingDirectoryArgs(),
+    ...extraArgs('validate-args')
+  ])
+  await git.commit(status, 'Removed failing Diffblue tests')
+  core.endGroup()
+}
+
+/**
  * Runs `dcover create --pre-flight`.
  * Additionally uses `--fix-build` and commits any resulting fixes.
  *

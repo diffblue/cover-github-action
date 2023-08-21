@@ -14,6 +14,9 @@ inputs:
   working-directory:
     required: false
     description: The working directory to pass to `dcover` comamnds that accept a `--working-directory` argument.
+  validate-args:
+    required: false
+    description: Additional command line arguments for the `dcover validate` command.
   create-args:
     required: false
     description: Additional command line arguments for the `dcover create` command.
