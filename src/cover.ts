@@ -49,44 +49,19 @@ export async function activate(): Promise<void> {
 
 /**
  * Runs `dcover create --pre-flight`.
+ * Additionally uses `--fix-build` and commits any resulting fixes.
+ *
+ * @param status the status to be updated and saved.
  */
-export async function createPreFlight(): Promise<void> {
+export async function createPreFlight(status: Status): Promise<void> {
   core.startGroup('Create (pre-flight)')
   await exec.exec('dcover', [
     'create',
     '--batch',
     '--pre-flight',
+    '--fix-build',
     ...workingDirectoryArgs(),
     ...extraArgs('create-args')
-  ])
-  core.endGroup()
-}
-
-/**
- * Runs `dcover fix-build`, if a `.diffblue/refactorings.yml` is found.
- *
- * @param status the status to be updated and saved.
- */
-export async function fixBuildIfNeeded(status: Status): Promise<void> {
-  const globber = await glob.create('**/.diffblue/refactorings.yml')
-  const refactorings: string[] = await globber.glob()
-  if (refactorings) {
-    await fixBuild(status)
-  }
-}
-
-/**
- * Runs `dcover fix-build`.
- *
- * @param status the status to be updated and saved.
- */
-export async function fixBuild(status: Status): Promise<void> {
-  core.startGroup('Fix build')
-  await exec.exec('dcover', [
-    'fix-build',
-    '--batch',
-    ...workingDirectoryArgs(),
-    ...extraArgs('refactor-args')
   ])
   await git.commit(status, 'Fixed build for use with Diffblue Cover')
   core.endGroup()
