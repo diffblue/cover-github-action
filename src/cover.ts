@@ -48,6 +48,23 @@ export async function activate(): Promise<void> {
 }
 
 /**
+ * Runs `dcover clean`.
+ *
+ * @param status the status to be updated and saved.
+ */
+export async function clean(status: Status): Promise<void> {
+  core.startGroup('Clean')
+  await exec.exec('dcover', [
+    'clean',
+    '--batch',
+    ...workingDirectoryArgs(),
+    ...extraArgs('clean-args')
+  ])
+  await git.commit(status, 'Removed non-compiling Diffblue tests')
+  core.endGroup()
+}
+
+/**
  * Runs `dcover validate`.
  *
  * @param status the status to be updated and saved.
