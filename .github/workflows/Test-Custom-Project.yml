@@ -60,3 +60,28 @@ jobs:
           user-email: db-ci-platform@diffblue.com
           # Add a differentiator based on the matrix
           topic-id-differentiator: ${{ matrix.os }}
+      
+      - run: |
+          git remote --verbose
+          git config user.name "Diffblue CI"
+          git config user.email db-ci-platform@diffblue.com
+          git fetch --all
+          git checkout ${{ github.head_ref }}
+
+      - name: Gradle Build
+        run: ./gradlew --console plain build
+        working-directory: ./test/gradle-project
+
+      - name: Diffblue Cover (clean)
+        uses: ./clean/
+        env:
+          GITHUB_TOKEN: ${{ secrets.DIFFBLUE_TOKEN }}
+          JVM_ARGS: -Xmx4096m
+        with:
+          # User name and email used to author commits
+          user-name: Diffblue CI
+          user-email: db-ci-platform@diffblue.com
+          # Integration test project lives in a subdir
+          working-directory: ./test/gradle-project
+          # Add a differentiator based on the matrix
+          topic-id-differentiator: ${{ matrix.os }}
