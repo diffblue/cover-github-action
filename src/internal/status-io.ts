@@ -3,6 +3,7 @@ import * as core from '@actions/core'
 import {Octokit} from '@octokit/action'
 import {readFileSync, writeFileSync} from 'fs'
 import {Status} from './status-model'
+import {markdownComment} from './status-md'
 
 /** The directory where the status files should be written. */
 const dir = '.diffblue'
@@ -49,7 +50,7 @@ export async function readStatus(): Promise<Status> {
 export async function saveStatus(status: Status): Promise<void> {
   try {
     await io.mkdirP(dir)
-    writeFileSync(markdownFile, status.comment(), {flag: 'w'})
+    writeFileSync(markdownFile, markdownComment(status), {flag: 'w'})
     writeFileSync(jsonFile, JSON.stringify(status, undefined, '  '), {
       flag: 'w'
     })
@@ -81,7 +82,7 @@ async function createOrUpdateComment(
         owner: status.owner,
         repo: status.repo,
         comment_id: status.comment_id,
-        body: status.comment()
+        body: markdownComment(status)
       })
       core.debug(`Updated Comment: ${resp.data.html_url}`)
     } else {
@@ -89,7 +90,7 @@ async function createOrUpdateComment(
         owner: status.owner,
         repo: status.repo,
         issue_number: status.issue_number,
-        body: status.comment()
+        body: markdownComment(status)
       })
       status.comment_id = response.data.id
       await io.mkdirP(dir)
