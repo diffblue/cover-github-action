@@ -1,0 +1,22 @@
+name: Diffblue Cover (validate)
+description: Component action for running "dcover validate", used for custom workflows in complex projects.
+author: Diffblue
+inputs:
+  user-name:
+    required: true
+    description: The name of the commit author, used to configure the git `user.name`.
+  user-email:
+    required: true
+    description: The email address of the commit author, used to configure the git `user.name`.
+  working-directory:
+    required: false
+    description: The working directory to pass to `dcover` comamnds that accept a `--working-directory` argument.
+  validate-args:
+    required: false
+    description: Additional command line arguments for the `dcover validate` command.
+  topic-id-differentiator:
+    required: false
+    description: Optional string to differentiate multiple uses of the actions within a single workflow.
+runs:
+  using: node16
+  main: ../dist/validate/index.js

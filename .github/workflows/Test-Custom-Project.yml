@@ -85,3 +85,17 @@ jobs:
           working-directory: ./test/gradle-project
           # Add a differentiator based on the matrix
           topic-id-differentiator: ${{ matrix.os }}
+
+      - name: Diffblue Cover (validate)
+        uses: ./validate/
+        env:
+          GITHUB_TOKEN: ${{ secrets.DIFFBLUE_TOKEN }}
+          JVM_ARGS: -Xmx4096m
+        with:
+          # User name and email used to author commits
+          user-name: Diffblue CI
+          user-email: db-ci-platform@diffblue.com
+          # Integration test project lives in a subdir
+          working-directory: ./test/gradle-project
+          # Add a differentiator based on the matrix
+          topic-id-differentiator: ${{ matrix.os }}
