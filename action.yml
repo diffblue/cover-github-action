@@ -1,5 +1,5 @@
-name: Diffblue Cover GitHub Action
-description: GitHub Action for running Diffblue Cover from a GitHub Actions workflow
+name: Diffblue Cover
+description: Runs Diffblue Cover in "batteries included" mode, ideal for single module projects.
 author: Diffblue
 inputs:
   license-key:

@@ -6,6 +6,9 @@ import {upload} from './internal/upload'
 import {summary} from './internal/summary'
 import {readStatus} from './internal/status-io'
 
+/**
+ * Runs the "batteries included" combined action.
+ */
 async function run(): Promise<void> {
   if (await skip()) {
     return
