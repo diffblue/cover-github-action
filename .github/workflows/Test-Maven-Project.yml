@@ -42,12 +42,20 @@ jobs:
           # the HEAD SHA in preparation for adding commits to the branch.
           ref: ${{ github.event.pull_request.head.sha }}
 
-      - name: Setup Git Config
+      - name: Prepare Git Author
         # Adding commits to the branch requires an author name and email address.
         run: |
           git config user.name "Diffblue CI"
           git config user.email "db-ci-platform@diffblue.com"
-
+  
+      - name: Prepare Git Patch
+        # Adding commits to the branch requires an author name and email address.
+        run: |
+          mkdir .diffblue
+          git fetch origin ${{ github.event.pull_request.base.ref }} --depth 100
+          git fetch origin ${{ github.event.pull_request.head.ref }} --depth 100
+          git diff --merge-base origin/${{ github.base_ref }} > .diffblue/cover-github-action.diff
+  
       - name: Maven Install
         run: mvn --batch-mode install
   
@@ -61,5 +69,7 @@ jobs:
           license-key: ${{ secrets.DIFFBLUE_LICENSE_KEY }}
           # Integration test project lives in a subdir
           working-directory: ./test/maven-project
+          # A patch file representing the pull request changes
+          patch: .diffblue/cover-github-action.diff
           # Add a differentiator based on the matrix
           topic-id-differentiator: ${{ matrix.os }}
