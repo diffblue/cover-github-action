@@ -61,7 +61,8 @@ jobs:
           # Add a differentiator based on the matrix
           topic-id-differentiator: ${{ matrix.os }}
       
-      - run: |
+      - name: Git Preparation
+        run: |
           git remote --verbose
           git config user.name "Diffblue CI"
           git config user.email db-ci-platform@diffblue.com
@@ -114,8 +115,9 @@ jobs:
           # Add a differentiator based on the matrix
           topic-id-differentiator: ${{ matrix.os }}
       
-      - run: |
-          git push
+      - name: Git Push
+        if: ${{ github.actor != 'dependabot[bot]' }}
+        run: git push
 
       - name: Diffblue Cover (summary)
         uses: ./summary/
