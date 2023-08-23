@@ -1,4 +1,5 @@
 import * as core from '@actions/core'
+import * as exec from '@actions/exec'
 import * as github from '@actions/github'
 import {Octokit} from '@octokit/action'
 
@@ -12,11 +13,23 @@ declare let process: {
  * @returns `true` iff the action should be skipped for any reason
  */
 export async function skip(): Promise<boolean> {
-  return (
-    (await skipEventType()) ||
-    (await skipDependabot()) ||
-    (await skipOwnCommits())
-  )
+  core.startGroup('Checking whether to skip')
+  let result = false
+  try {
+    result =
+      (await skipEventType()) ||
+      (await skipDependabot()) ||
+      (await skipOwnCommits())
+  } catch (e) {
+    if (e instanceof Error) {
+      core.setFailed(e)
+    } else {
+      core.setFailed(`${e}`)
+    }
+    result = true
+  }
+  core.endGroup()
+  return result
 }
 
 /**
@@ -60,14 +73,17 @@ export async function skipOwnCommits(): Promise<boolean> {
 /**
  * @returns the name and email address of the configured commit author, if configured.
  */
-async function configuredAuthor(): Promise<string | undefined> {
-  const configName = core.getInput('user-name')
-  const configEmail = core.getInput('user-email')
-  if (configName !== '' && configEmail !== '') {
-    return `${configName} <${configEmail}>`
-  } else {
-    return undefined
+async function configuredAuthor(): Promise<string> {
+  const configName = (
+    await exec.getExecOutput('git', ['config', '--get', 'user.name'])
+  ).stdout.trim()
+  const configEmail = (
+    await exec.getExecOutput('git', ['config', '--get', 'user.email'])
+  ).stdout.trim()
+  if (configName === '' || configEmail === '') {
+    new Error('Please configure git user.name and user.email')
   }
+  return `${configName} <${configEmail}>`
 }
 
 /**

@@ -328,40 +328,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.push = exports.commit = exports.prepare = void 0;
-const core = __importStar(__nccwpck_require__(2186));
+exports.push = exports.commit = void 0;
 const exec = __importStar(__nccwpck_require__(1514));
-/**
- * Runs various `git` subcommands in order to prepare the workspace
- * for committing and pushing refactorings and tests.
- *
- * @param status the status to be updated and saved.
- */
-function prepare(status) {
-    return __awaiter(this, void 0, void 0, function* () {
-        core.startGroup('Prepare');
-        core.info('Preparing git clone for committing and pushing tests.');
-        const missing = [];
-        const name = core.getInput('user-name');
-        if (!name) {
-            missing.push(`'user-name'`);
-        }
-        const email = core.getInput('user-email');
-        if (!email) {
-            missing.push(`'user-email'`);
-        }
-        if (missing.length > 0) {
-            throw new Error(`Unable to prepare git workspace due to missing configuration: ${missing.join(', ')}`);
-        }
-        yield exec.exec('git', ['remote', '--verbose']);
-        yield exec.exec('git', ['config', 'user.name', name]);
-        yield exec.exec('git', ['config', 'user.email', email]);
-        yield exec.exec('git', ['fetch', 'origin', status.ref, '--deepen', '10']);
-        yield exec.exec('git', ['checkout', status.sha]);
-        core.endGroup();
-    });
-}
-exports.prepare = prepare;
 /**
  * Runs `git commit` to commit modified files.
  *
@@ -642,6 +610,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.skipOwnCommits = exports.skipDependabot = exports.skipEventType = exports.skip = void 0;
 const core = __importStar(__nccwpck_require__(2186));
+const exec = __importStar(__nccwpck_require__(1514));
 const github = __importStar(__nccwpck_require__(5438));
 const action_1 = __nccwpck_require__(1231);
 /**
@@ -649,9 +618,25 @@ const action_1 = __nccwpck_require__(1231);
  */
 function skip() {
     return __awaiter(this, void 0, void 0, function* () {
-        return ((yield skipEventType()) ||
-            (yield skipDependabot()) ||
-            (yield skipOwnCommits()));
+        core.startGroup('Checking whether to skip');
+        let result = false;
+        try {
+            result =
+                (yield skipEventType()) ||
+                    (yield skipDependabot()) ||
+                    (yield skipOwnCommits());
+        }
+        catch (e) {
+            if (e instanceof Error) {
+                core.setFailed(e);
+            }
+            else {
+                core.setFailed(`${e}`);
+            }
+            result = true;
+        }
+        core.endGroup();
+        return result;
     });
 }
 exports.skip = skip;
@@ -703,14 +688,12 @@ exports.skipOwnCommits = skipOwnCommits;
  */
 function configuredAuthor() {
     return __awaiter(this, void 0, void 0, function* () {
-        const configName = core.getInput('user-name');
-        const configEmail = core.getInput('user-email');
-        if (configName !== '' && configEmail !== '') {
-            return `${configName} <${configEmail}>`;
+        const configName = (yield exec.getExecOutput('git', ['config', '--get', 'user.name'])).stdout.trim();
+        const configEmail = (yield exec.getExecOutput('git', ['config', '--get', 'user.email'])).stdout.trim();
+        if (configName === '' || configEmail === '') {
+            new Error('Please configure git user.name and user.email');
         }
-        else {
-            return undefined;
-        }
+        return `${configName} <${configEmail}>`;
     });
 }
 /**

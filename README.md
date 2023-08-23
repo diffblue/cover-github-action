@@ -21,9 +21,6 @@ jobs:
         with:
           # License key used to activate the installation
           license-key: ${{ secrets.DIFFBLUE_LICENSE_KEY }}
-          # User name and email used to author commits
-          user-name: Diffblue CI
-          user-email: db-ci-platform@diffblue.com
 ```
 
 For custom or complex workflows there are also a collection of component actions available to control installation or a single `dcover` subcommand:
