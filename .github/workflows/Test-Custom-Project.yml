@@ -26,6 +26,12 @@ jobs:
         
     steps:
 
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          java-version: '8'
+          distribution: 'zulu'
+
       - name: Checkout
         uses: actions/checkout@v3
         with:
@@ -41,12 +47,6 @@ jobs:
         run: |
           git config user.name "Diffblue CI"
           git config user.email "db-ci-platform@diffblue.com"
-
-      - name: Setup Java
-        uses: actions/setup-java@v3
-        with:
-          java-version: '8'
-          distribution: 'zulu'
 
       - name: Diffblue Cover (install)
         uses: ./install/
