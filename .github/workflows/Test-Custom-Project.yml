@@ -7,6 +7,14 @@ on:
       - main
       - 'releases/*'
 
+concurrency:
+
+  # Avoid running the same workflow on the same branch concurrently
+  group: ${{ github.workflow }}-${{ github.ref }}
+
+  # Cancel previous runs of the workflow unless running on the main branch
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
 jobs:
 
   Test:
