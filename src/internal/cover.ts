@@ -1,6 +1,8 @@
 import * as glob from '@actions/glob'
 import * as core from '@actions/core'
 import * as exec from '@actions/exec'
+import * as fs from 'fs'
+import * as path from 'path'
 import * as git from './git'
 import * as gradle from './gradle'
 import {installLatestVersion} from './install-latest-version'
@@ -108,13 +110,27 @@ export async function createPreFlight(status: Status): Promise<void> {
  */
 export async function create(status: Status): Promise<void> {
   core.startGroup('Create')
-  await exec.exec('dcover', [
-    'create',
-    '--batch',
-    ...workingDirectoryArgs(),
-    ...extraArgs('create-args')
-  ])
-  await git.commit(status, 'Added tests created with Diffblue Cover')
+
+  const patchFile = core.getInput('patch')
+  if (patchFile === '' || isBaseline()) {
+    await exec.exec('dcover', [
+      'create',
+      '--batch',
+      ...workingDirectoryArgs(),
+      ...extraArgs('create-args')
+    ])
+    await git.commit(status, 'Baseline tests from Diffblue Cover')
+  } else {
+    await exec.exec('dcover', [
+      'create',
+      '--batch',
+      '--patch-only',
+      path.resolve(patchFile),
+      ...workingDirectoryArgs(),
+      ...extraArgs('create-args')
+    ])
+    await git.commit(status, 'Updated tests from Diffblue Cover')
+  }
 
   const globber = await glob.create('**/.diffblue/reports/report.json')
   const reportFiles: string[] = await globber.glob()
@@ -146,6 +162,31 @@ export async function cleanup(): Promise<void> {
   core.startGroup('Cleanup')
   await gradle.stop()
   core.endGroup()
+}
+
+/**
+ * @returns `true` if no baseline marker exists.
+ */
+export function isBaseline(): boolean {
+  let baselineFile: string
+  const workingDirectory = core.getInput('working-directory')
+  if (workingDirectory) {
+    baselineFile = `${workingDirectory}/.diffblue-baseline-marker`
+  } else {
+    baselineFile = `.diffblue-baseline-marker`
+  }
+
+  const baseline = !fs.existsSync(baselineFile)
+
+  if (baseline) {
+    fs.writeFileSync(
+      baselineFile,
+      'This file indicates that baseline tests have been created for this module\n'
+    )
+    exec.exec('git', ['add', baselineFile])
+  }
+
+  return baseline
 }
 
 /**
