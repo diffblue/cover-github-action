@@ -19,10 +19,6 @@ jobs:
     strategy:
         matrix:
             os: [ubuntu-latest]
-
-    defaults:
-      run:
-        working-directory: ./test/gradle-project
         
     steps:
 
@@ -57,6 +53,7 @@ jobs:
           git diff --merge-base origin/${{ github.base_ref }} > .diffblue/cover-github-action.diff
   
       - name: Gradle Build
+        working-directory: ./test/gradle-project
         run: ./gradlew --console plain build
 
       - name: Diffblue Cover

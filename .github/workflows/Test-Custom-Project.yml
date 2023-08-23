@@ -19,10 +19,6 @@ jobs:
     strategy:
         matrix:
             os: [windows-latest]
-
-    defaults:
-      run:
-        working-directory: ./test
         
     steps:
 
@@ -77,8 +73,8 @@ jobs:
           topic-id-differentiator: ${{ matrix.os }}
       
       - name: Gradle Build
-        run: ./gradlew --console plain build
         working-directory: ./test/gradle-project
+        run: ./gradlew --console plain build
 
       - name: Diffblue Cover (clean)
         uses: ./clean/
