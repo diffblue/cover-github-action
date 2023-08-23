@@ -1,0 +1,132 @@
+name: "Test: Custom Project"
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - 'releases/*'
+
+jobs:
+
+  Test:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+        matrix:
+            os: [windows-latest]
+
+    defaults:
+      run:
+        working-directory: ./test
+        
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          # The default GITHUB_TOKEN doesn't have the necessary permissions
+          # so a custom token should be used here with sufficient access.
+          token: ${{ secrets.DIFFBLUE_TOKEN }}
+
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          java-version: '8'
+          distribution: 'zulu'
+
+      - name: Diffblue Cover (install)
+        uses: ./install/
+        env:
+          GITHUB_TOKEN: ${{ secrets.DIFFBLUE_TOKEN }}
+          JVM_ARGS: -Xmx4096m
+        with:
+          # User name and email used to author commits
+          user-name: Diffblue CI
+          user-email: db-ci-platform@diffblue.com
+          # Add a differentiator based on the matrix
+          topic-id-differentiator: ${{ matrix.os }}
+
+      - name: Diffblue Cover (activate)
+        uses: ./activate/
+        env:
+          GITHUB_TOKEN: ${{ secrets.DIFFBLUE_TOKEN }}
+          JVM_ARGS: -Xmx4096m
+        with:
+          # License key used to activate the installation
+          license-key: ${{ secrets.DIFFBLUE_LICENSE_KEY }}
+          # User name and email used to author commits
+          user-name: Diffblue CI
+          user-email: db-ci-platform@diffblue.com
+          # Add a differentiator based on the matrix
+          topic-id-differentiator: ${{ matrix.os }}
+      
+      - run: |
+          git remote --verbose
+          git config user.name "Diffblue CI"
+          git config user.email db-ci-platform@diffblue.com
+          git fetch --all
+          git checkout ${{ github.head_ref }}
+
+      - name: Gradle Build
+        run: ./gradlew --console plain build
+        working-directory: ./test/gradle-project
+
+      - name: Diffblue Cover (clean)
+        uses: ./clean/
+        env:
+          GITHUB_TOKEN: ${{ secrets.DIFFBLUE_TOKEN }}
+          JVM_ARGS: -Xmx4096m
+        with:
+          # User name and email used to author commits
+          user-name: Diffblue CI
+          user-email: db-ci-platform@diffblue.com
+          # Integration test project lives in a subdir
+          working-directory: ./test/gradle-project
+          # Add a differentiator based on the matrix
+          topic-id-differentiator: ${{ matrix.os }}
+
+      - name: Diffblue Cover (validate)
+        uses: ./validate/
+        env:
+          GITHUB_TOKEN: ${{ secrets.DIFFBLUE_TOKEN }}
+          JVM_ARGS: -Xmx4096m
+        with:
+          # User name and email used to author commits
+          user-name: Diffblue CI
+          user-email: db-ci-platform@diffblue.com
+          # Integration test project lives in a subdir
+          working-directory: ./test/gradle-project
+          # Add a differentiator based on the matrix
+          topic-id-differentiator: ${{ matrix.os }}
+
+      - name: Diffblue Cover (create)
+        uses: ./create/
+        env:
+          GITHUB_TOKEN: ${{ secrets.DIFFBLUE_TOKEN }}
+          JVM_ARGS: -Xmx4096m
+        with:
+          # User name and email used to author commits
+          user-name: Diffblue CI
+          user-email: db-ci-platform@diffblue.com
+          # Integration test project lives in a subdir
+          working-directory: ./test/gradle-project
+          # Add a differentiator based on the matrix
+          topic-id-differentiator: ${{ matrix.os }}
+      
+      - run: |
+          git push
+
+      - name: Diffblue Cover (summary)
+        uses: ./summary/
+        env:
+          GITHUB_TOKEN: ${{ secrets.DIFFBLUE_TOKEN }}
+          JVM_ARGS: -Xmx4096m
+        with:
+          # User name and email used to author commits
+          user-name: Diffblue CI
+          user-email: db-ci-platform@diffblue.com
+          # Integration test project lives in a subdir
+          working-directory: ./test/gradle-project
+          # Add a differentiator based on the matrix
+          topic-id-differentiator: ${{ matrix.os }}

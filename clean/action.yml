@@ -1,10 +1,7 @@
-name: Diffblue Cover
-description: Runs Diffblue Cover in "batteries included" mode, ideal for single module projects.
+name: Diffblue Cover (clean)
+description: Component action for running "dcover clean", used for custom workflows in complex projects.
 author: Diffblue
 inputs:
-  license-key:
-    required: true
-    description: The license key provided in your welcome email or provided by your organization
   user-name:
     required: true
     description: The name of the commit author, used to configure the git `user.name`.
@@ -17,18 +14,9 @@ inputs:
   clean-args:
     required: false
     description: Additional command line arguments for the `dcover clean` command.
-  validate-args:
-    required: false
-    description: Additional command line arguments for the `dcover validate` command.
-  create-args:
-    required: false
-    description: Additional command line arguments for the `dcover create` command.
-  refactor-args:
-    required: false
-    description: Additional command line arguments for the `dcover refactor` command.
   topic-id-differentiator:
     required: false
     description: Optional string to differentiate multiple uses of the actions within a single workflow.
 runs:
   using: node16
-  main: dist/index.js
+  main: ../dist/clean/index.js

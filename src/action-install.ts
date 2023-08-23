@@ -1,11 +1,12 @@
 import * as core from '@actions/core'
-import * as git from './git'
-import * as cover from './cover'
-import {skip} from './skip'
-import {upload} from './upload'
-import {summary} from './summary'
-import {readStatus} from './status-io'
+import * as cover from './internal/cover'
+import {skip} from './internal/skip'
+import {upload} from './internal/upload'
+import {readStatus, saveStatus} from './internal/status-io'
 
+/**
+ * Runs the "install" isolated action.
+ */
 async function run(): Promise<void> {
   if (await skip()) {
     return
@@ -13,14 +14,7 @@ async function run(): Promise<void> {
 
   const status = await readStatus()
   try {
-    await git.prepare(status)
     await cover.install(status)
-    await cover.activate()
-    await cover.clean(status)
-    await cover.validate(status)
-    await cover.createPreFlight(status)
-    await cover.create(status)
-    await git.push(status)
   } catch (error) {
     status.error = error
     if (error instanceof Error) {
@@ -31,9 +25,9 @@ async function run(): Promise<void> {
     }
   }
 
+  await saveStatus(status)
   await cover.cleanup()
   await upload(status)
-  await summary(status)
 }
 
 run()

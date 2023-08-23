@@ -1,5 +1,5 @@
-name: Diffblue Cover
-description: Runs Diffblue Cover in "batteries included" mode, ideal for single module projects.
+name: Diffblue Cover (install)
+description: Component action for installing Diffblue Cover, used for custom workflows in complex projects.
 author: Diffblue
 inputs:
   license-key:
@@ -14,21 +14,9 @@ inputs:
   working-directory:
     required: false
     description: The working directory to pass to `dcover` comamnds that accept a `--working-directory` argument.
-  clean-args:
-    required: false
-    description: Additional command line arguments for the `dcover clean` command.
-  validate-args:
-    required: false
-    description: Additional command line arguments for the `dcover validate` command.
-  create-args:
-    required: false
-    description: Additional command line arguments for the `dcover create` command.
-  refactor-args:
-    required: false
-    description: Additional command line arguments for the `dcover refactor` command.
   topic-id-differentiator:
     required: false
     description: Optional string to differentiate multiple uses of the actions within a single workflow.
 runs:
   using: node16
-  main: dist/index.js
+  main: ../dist/install/index.js

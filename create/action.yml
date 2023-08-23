@@ -1,0 +1,22 @@
+name: Diffblue Cover (create)
+description: Component action for running "dcover create", used for custom workflows in complex projects.
+author: Diffblue
+inputs:
+  user-name:
+    required: true
+    description: The name of the commit author, used to configure the git `user.name`.
+  user-email:
+    required: true
+    description: The email address of the commit author, used to configure the git `user.name`.
+  working-directory:
+    required: false
+    description: The working directory to pass to `dcover` comamnds that accept a `--working-directory` argument.
+  create-args:
+    required: false
+    description: Additional command line arguments for the `dcover clean` command.
+  topic-id-differentiator:
+    required: false
+    description: Optional string to differentiate multiple uses of the actions within a single workflow.
+runs:
+  using: node16
+  main: ../dist/create/index.js
