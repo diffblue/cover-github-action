@@ -16,7 +16,6 @@ async function run(): Promise<void> {
 
   const status = await readStatus()
   try {
-    await git.prepare(status)
     await cover.install(status)
     await cover.activate()
     await cover.clean(status)

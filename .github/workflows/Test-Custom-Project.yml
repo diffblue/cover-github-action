@@ -58,9 +58,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.DIFFBLUE_TOKEN }}
           JVM_ARGS: -Xmx4096m
         with:
-          # User name and email used to author commits
-          user-name: Diffblue CI
-          user-email: db-ci-platform@diffblue.com
           # Add a differentiator based on the matrix
           topic-id-differentiator: ${{ matrix.os }}
 
@@ -72,9 +69,6 @@ jobs:
         with:
           # License key used to activate the installation
           license-key: ${{ secrets.DIFFBLUE_LICENSE_KEY }}
-          # User name and email used to author commits
-          user-name: Diffblue CI
-          user-email: db-ci-platform@diffblue.com
           # Add a differentiator based on the matrix
           topic-id-differentiator: ${{ matrix.os }}
       
@@ -88,9 +82,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.DIFFBLUE_TOKEN }}
           JVM_ARGS: -Xmx4096m
         with:
-          # User name and email used to author commits
-          user-name: Diffblue CI
-          user-email: db-ci-platform@diffblue.com
           # Integration test project lives in a subdir
           working-directory: ./test/gradle-project
           # Add a differentiator based on the matrix
@@ -102,9 +93,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.DIFFBLUE_TOKEN }}
           JVM_ARGS: -Xmx4096m
         with:
-          # User name and email used to author commits
-          user-name: Diffblue CI
-          user-email: db-ci-platform@diffblue.com
           # Integration test project lives in a subdir
           working-directory: ./test/gradle-project
           # Add a differentiator based on the matrix
@@ -116,9 +104,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.DIFFBLUE_TOKEN }}
           JVM_ARGS: -Xmx4096m
         with:
-          # User name and email used to author commits
-          user-name: Diffblue CI
-          user-email: db-ci-platform@diffblue.com
           # Integration test project lives in a subdir
           working-directory: ./test/gradle-project
           # Add a differentiator based on the matrix
@@ -134,9 +119,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.DIFFBLUE_TOKEN }}
           JVM_ARGS: -Xmx4096m
         with:
-          # User name and email used to author commits
-          user-name: Diffblue CI
-          user-email: db-ci-platform@diffblue.com
           # Integration test project lives in a subdir
           working-directory: ./test/gradle-project
           # Add a differentiator based on the matrix
