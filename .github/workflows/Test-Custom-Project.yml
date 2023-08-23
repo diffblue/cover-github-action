@@ -36,6 +36,15 @@ jobs:
           # The default GITHUB_TOKEN doesn't have the necessary permissions
           # so a custom token should be used here with sufficient access.
           token: ${{ secrets.DIFFBLUE_TOKEN }}
+          # By default the merge commit is checked out, but here we want
+          # the HEAD SHA in preparation for adding commits to the branch.
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Setup Git Config
+        # Adding commits to the branch requires an author name and email address.
+        run: |
+          git config user.name "Diffblue CI"
+          git config user.email "db-ci-platform@diffblue.com"
 
       - name: Setup Java
         uses: actions/setup-java@v3
@@ -69,14 +78,6 @@ jobs:
           # Add a differentiator based on the matrix
           topic-id-differentiator: ${{ matrix.os }}
       
-      - name: Git Preparation
-        run: |
-          git remote --verbose
-          git config user.name "Diffblue CI"
-          git config user.email db-ci-platform@diffblue.com
-          git fetch --all
-          git checkout ${{ github.head_ref }}
-
       - name: Gradle Build
         run: ./gradlew --console plain build
         working-directory: ./test/gradle-project
@@ -125,7 +126,7 @@ jobs:
       
       - name: Git Push
         if: ${{ github.actor != 'dependabot[bot]' }}
-        run: git push
+        run: git push origin HEAD:${{ github.event.pull_request.head.ref }}
 
       - name: Diffblue Cover (summary)
         uses: ./summary/
