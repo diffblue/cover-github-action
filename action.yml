@@ -8,6 +8,9 @@ inputs:
   working-directory:
     required: false
     description: The working directory to pass to `dcover` comamnds that accept a `--working-directory` argument.
+  patch:
+    required: false
+    description: The patch file representing the changes in the current pull request.
   clean-args:
     required: false
     description: Additional command line arguments for the `dcover clean` command.

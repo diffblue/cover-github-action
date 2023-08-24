@@ -113,10 +113,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.cleanup = exports.create = exports.createPreFlight = exports.validate = exports.clean = exports.activate = exports.install = void 0;
+exports.isBaseline = exports.cleanup = exports.create = exports.createPreFlight = exports.validate = exports.clean = exports.activate = exports.install = void 0;
 const glob = __importStar(__nccwpck_require__(8090));
 const core = __importStar(__nccwpck_require__(2186));
 const exec = __importStar(__nccwpck_require__(1514));
+const fs = __importStar(__nccwpck_require__(7147));
+const path = __importStar(__nccwpck_require__(1017));
 const git = __importStar(__nccwpck_require__(9147));
 const gradle = __importStar(__nccwpck_require__(4959));
 const install_latest_version_1 = __nccwpck_require__(8292);
@@ -225,13 +227,27 @@ exports.createPreFlight = createPreFlight;
 function create(status) {
     return __awaiter(this, void 0, void 0, function* () {
         core.startGroup('Create');
-        yield exec.exec('dcover', [
-            'create',
-            '--batch',
-            ...workingDirectoryArgs(),
-            ...extraArgs('create-args')
-        ]);
-        yield git.commit(status, 'Added tests created with Diffblue Cover');
+        const patchFile = core.getInput('patch');
+        if (patchFile === '' || isBaseline()) {
+            yield exec.exec('dcover', [
+                'create',
+                '--batch',
+                ...workingDirectoryArgs(),
+                ...extraArgs('create-args')
+            ]);
+            yield git.commit(status, 'Baseline tests from Diffblue Cover');
+        }
+        else {
+            yield exec.exec('dcover', [
+                'create',
+                '--batch',
+                '--patch-only',
+                path.resolve(patchFile),
+                ...workingDirectoryArgs(),
+                ...extraArgs('create-args')
+            ]);
+            yield git.commit(status, 'Updated tests from Diffblue Cover');
+        }
         const globber = yield glob.create('**/.diffblue/reports/report.json');
         const reportFiles = yield globber.glob();
         for (const reportFile of reportFiles) {
@@ -264,6 +280,26 @@ function cleanup() {
     });
 }
 exports.cleanup = cleanup;
+/**
+ * @returns `true` if no baseline marker exists.
+ */
+function isBaseline() {
+    let baselineFile;
+    const workingDirectory = core.getInput('working-directory');
+    if (workingDirectory) {
+        baselineFile = `${workingDirectory}/.diffblue-baseline-marker`;
+    }
+    else {
+        baselineFile = `.diffblue-baseline-marker`;
+    }
+    const baseline = !fs.existsSync(baselineFile);
+    if (baseline) {
+        fs.writeFileSync(baselineFile, 'This file indicates that baseline tests have been created for this module\n');
+        exec.exec('git', ['add', baselineFile]);
+    }
+    return baseline;
+}
+exports.isBaseline = isBaseline;
 /**
  * @returns the `--working-directory` arguments based on `working-directory` input, or an empty array.
  */
