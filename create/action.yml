@@ -8,6 +8,9 @@ inputs:
   patch:
     required: false
     description: The patch file representing the changes in the current pull request.
+  commit-and-push:
+    required: false
+    description: 'true' or '' if the commands should commit and push changes back to the branch.
   create-args:
     required: false
     description: Additional command line arguments for the `dcover clean` command.
