@@ -97,6 +97,7 @@ export async function createPreFlight(status: Status): Promise<void> {
     '--pre-flight',
     '--fix-build',
     ...workingDirectoryArgs(),
+    ...coverReportsArgs(status),
     ...extraArgs('create-args')
   ])
   await git.commit(status, 'Fixed build for use with Diffblue Cover')
@@ -117,6 +118,7 @@ export async function create(status: Status): Promise<void> {
       'create',
       '--batch',
       ...workingDirectoryArgs(),
+      ...coverReportsArgs(status),
       ...extraArgs('create-args')
     ])
     await git.commit(status, 'Baseline tests from Diffblue Cover')
@@ -199,6 +201,25 @@ function workingDirectoryArgs(): string[] {
   } else {
     return []
   }
+}
+
+/**
+ * @param status the status to derive project argument.
+ * @returns the `--coverage-reports` arguments based on `cover-reports-url` input, or an empty array.
+ */
+function coverReportsArgs(status: Status): string[] {
+  const url = core.getInput(`cover-reports-url`)
+  if (url === '') {
+    return []
+  }
+
+  return [
+    `--coverage-reports`,
+    `--report`,
+    url,
+    `--project`,
+    `${status.owner}.${status.repo}`
+  ]
 }
 
 /**
