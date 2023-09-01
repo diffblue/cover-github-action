@@ -5,7 +5,7 @@ import {upload} from './internal/upload'
 import {readStatus, saveStatus} from './internal/status-io'
 
 /**
- * Runs the "validate" isolated action.
+ * Runs the "create" isolated action.
  */
 async function run(): Promise<void> {
   if (await skip()) {
@@ -14,7 +14,7 @@ async function run(): Promise<void> {
 
   const status = await readStatus()
   try {
-    await cover.validate(status)
+    await cover.create(status)
   } catch (error) {
     status.error = error
     if (error instanceof Error) {
