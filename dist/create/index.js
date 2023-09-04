@@ -45,7 +45,7 @@ const skip_1 = __nccwpck_require__(11);
 const upload_1 = __nccwpck_require__(4084);
 const status_io_1 = __nccwpck_require__(5973);
 /**
- * Runs the "validate" isolated action.
+ * Runs the "create" isolated action.
  */
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
@@ -54,7 +54,7 @@ function run() {
         }
         const status = yield (0, status_io_1.readStatus)();
         try {
-            yield cover.validate(status);
+            yield cover.create(status);
         }
         catch (error) {
             status.error = error;
@@ -365,19 +365,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.push = exports.commit = void 0;
-const core = __importStar(__nccwpck_require__(2186));
 const exec = __importStar(__nccwpck_require__(1514));
 /**
  * Runs `git commit` to commit modified files.
- * Unless `commit-and-push` is configured to `false`.
  *
  * @param status the status to be updated and saved.
  */
 function commit(status, message) {
     return __awaiter(this, void 0, void 0, function* () {
-        if (!enabled()) {
-            return;
-        }
         const result = yield exec.getExecOutput('git', [
             'status',
             '--untracked-files=all',
@@ -399,26 +394,15 @@ function commit(status, message) {
 exports.commit = commit;
 /**
  * Runs `git push` to push changes up.
- * Unless `commit-and-push` is configured to `false`.
  *
  * @param status the status to be updated and saved.
  */
 function push(status) {
     return __awaiter(this, void 0, void 0, function* () {
-        if (!enabled()) {
-            return;
-        }
         yield exec.exec('git', ['push', 'origin', `HEAD:${status.ref}`]);
     });
 }
 exports.push = push;
-/**
- * @returns true iff the `commit-and-push` configuration allows committing and pushing.
- */
-function enabled() {
-    return (core.getInput('commit-and-push') === '' ||
-        core.getInput('commit-and-push') === 'true');
-}
 
 
 /***/ }),
