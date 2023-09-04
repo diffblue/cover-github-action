@@ -2,6 +2,15 @@ import * as exec from '@actions/exec'
 import {Status} from './status-model'
 
 /**
+ * Runs `git add` to add modified files.
+ *
+ * @param files  the paths to add.
+ */
+export async function add(files: string[]): Promise<void> {
+  await exec.exec('git', ['add', ...files])
+}
+
+/**
  * Runs `git commit` to commit modified files.
  *
  * @param status the status to be updated and saved.

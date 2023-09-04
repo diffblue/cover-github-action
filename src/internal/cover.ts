@@ -114,7 +114,7 @@ export async function create(status: Status): Promise<void> {
   const createArgs = ['create', '--batch']
 
   const patchFile = core.getInput('patch')
-  if (patchFile === '' || isBaseline()) {
+  if (patchFile === '' || (await isBaseline())) {
     await exec.exec('dcover', [
       ...createArgs,
       ...workingDirectoryArgs(),
@@ -167,7 +167,7 @@ export async function cleanup(): Promise<void> {
 /**
  * @returns `true` if no baseline marker exists.
  */
-export function isBaseline(): boolean {
+export async function isBaseline(): Promise<boolean> {
   let baselineFile: string
   const workingDirectory = core.getInput('working-directory')
   if (workingDirectory) {
@@ -183,7 +183,7 @@ export function isBaseline(): boolean {
       baselineFile,
       'This file indicates that baseline tests have been created for this module\n'
     )
-    exec.exec('git', ['add', baselineFile])
+    await git.add([baselineFile])
   }
 
   return baseline
