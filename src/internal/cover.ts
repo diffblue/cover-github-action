@@ -211,6 +211,12 @@ function coverReportsArgs(status: Status): string[] {
     return []
   }
 
+  // Smoke & Mirrors:
+  // Obviously this should make use of the url above, but
+  // the demo uses an SSH tunnel and the correct URL is never
+  // derived, so we end up hacking it together here instead:
+  status.cover_reports_url = `https://demo.reports.diffblue.co.uk/ui/project/${status.owner}/${status.repo}`
+
   return [
     `--coverage-reports`,
     `--report`,
