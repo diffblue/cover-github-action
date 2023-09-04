@@ -10,6 +10,7 @@ export function markdownComment(status: Status): string {
     ...markdownRunLines(status),
     ...markdownCommitLines(status),
     ...markdownVersionLines(status),
+    ...markdownCoverReportsLines(status),
     ...markdownErrorLines(status),
     ...markdownReportsLines(status),
     ...markdownWorkInProgressLines(status),
@@ -25,6 +26,7 @@ export function markdownSummary(status: Status): string {
   return [
     ...markdownHeaderLines(status),
     ...markdownVersionLines(status),
+    ...markdownCoverReportsLines(status),
     ...markdownErrorLines(status),
     ...markdownReportsLines(status),
     ``
@@ -62,6 +64,20 @@ function markdownCommitLines(status: Status): string[] {
 function markdownVersionLines(status: Status): string[] {
   if (status.version) {
     return [`- Version: ${status.version}`]
+  } else {
+    return []
+  }
+}
+
+/**
+ * @param status the status to render as markdown
+ * @returns lines of markdown content showing cover reports information
+ */
+function markdownCoverReportsLines(status: Status): string[] {
+  if (status.cover_reports_url) {
+    return [
+      `- Cover Report: [${status.owner} / ${status.repo}](${status.cover_reports_url})`
+    ]
   } else {
     return []
   }

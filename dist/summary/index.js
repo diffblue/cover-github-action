@@ -492,6 +492,7 @@ function markdownComment(status) {
         ...markdownRunLines(status),
         ...markdownCommitLines(status),
         ...markdownVersionLines(status),
+        ...markdownCoverReportsLines(status),
         ...markdownErrorLines(status),
         ...markdownReportsLines(status),
         ...markdownWorkInProgressLines(status),
@@ -507,6 +508,7 @@ function markdownSummary(status) {
     return [
         ...markdownHeaderLines(status),
         ...markdownVersionLines(status),
+        ...markdownCoverReportsLines(status),
         ...markdownErrorLines(status),
         ...markdownReportsLines(status),
         ``
@@ -541,6 +543,20 @@ function markdownCommitLines(status) {
 function markdownVersionLines(status) {
     if (status.version) {
         return [`- Version: ${status.version}`];
+    }
+    else {
+        return [];
+    }
+}
+/**
+ * @param status the status to render as markdown
+ * @returns lines of markdown content showing cover reports information
+ */
+function markdownCoverReportsLines(status) {
+    if (status.cover_reports_url) {
+        return [
+            `- Cover Report: [${status.owner} / ${status.repo}](${status.cover_reports_url})`
+        ];
     }
     else {
         return [];

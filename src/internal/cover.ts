@@ -97,6 +97,7 @@ export async function createPreFlight(status: Status): Promise<void> {
     '--pre-flight',
     '--fix-build',
     ...workingDirectoryArgs(),
+    ...coverReportsArgs(status),
     ...extraArgs('create-args')
   ])
   await git.commit(status, 'Fixed build for use with Diffblue Cover')
@@ -110,23 +111,22 @@ export async function createPreFlight(status: Status): Promise<void> {
  */
 export async function create(status: Status): Promise<void> {
   core.startGroup('Create')
+  const createArgs = ['create', '--batch']
 
   const patchFile = core.getInput('patch')
   if (patchFile === '' || isBaseline()) {
     await exec.exec('dcover', [
-      'create',
-      '--batch',
+      ...createArgs,
       ...workingDirectoryArgs(),
+      ...coverReportsArgs(status),
       ...extraArgs('create-args')
     ])
     await git.commit(status, 'Baseline tests from Diffblue Cover')
   } else {
     await exec.exec('dcover', [
-      'create',
-      '--batch',
-      '--patch-only',
-      path.resolve(patchFile),
+      ...createArgs,
       ...workingDirectoryArgs(),
+      ...patchOnlyArgs(patchFile),
       ...extraArgs('create-args')
     ])
     await git.commit(status, 'Updated tests from Diffblue Cover')
@@ -199,6 +199,42 @@ function workingDirectoryArgs(): string[] {
   } else {
     return []
   }
+}
+
+/**
+ * @param status the status to derive project argument.
+ * @returns the `--coverage-reports` arguments based on `cover-reports-url` input, or an empty array.
+ */
+function coverReportsArgs(status: Status): string[] {
+  const url = core.getInput(`cover-reports-url`)
+  if (url === '') {
+    return []
+  }
+
+  // Smoke & Mirrors:
+  // Obviously this should make use of the url above, but
+  // the demo uses an SSH tunnel and the correct URL is never
+  // derived, so we end up hacking it together here instead:
+  status.cover_reports_url = `https://demo.reports.diffblue.co.uk/ui/project/${status.owner}/${status.repo}`
+
+  return [
+    `--coverage-reports`,
+    `--report`,
+    url,
+    `--project`,
+    `${status.owner}.${status.repo}`
+  ]
+}
+
+/**
+ * @param patchFile the path to the patch file.
+ * @returns the `--patch-only` arguments, or an empty array if the given patch file is empty.
+ */
+function patchOnlyArgs(patchFile: string): string[] {
+  if (patchFile === '') {
+    return []
+  }
+  return ['--patch-only', path.resolve(patchFile)]
 }
 
 /**

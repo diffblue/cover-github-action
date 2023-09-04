@@ -55,6 +55,9 @@ export class Status {
   /** Any error associated with the overall status. */
   error?: unknown
 
+  /** The URl to the browseable project in Cover Reports. */
+  cover_reports_url?: string
+
   /**
    * Report summaries from any complete `dcover create` runs
    */

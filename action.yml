@@ -11,6 +11,9 @@ inputs:
   patch:
     required: false
     description: The patch file representing the changes in the current pull request.
+  cover-reports-url:
+    required: false
+    description: The URL where Cover Reports should be submitted to, if at all.
   clean-args:
     required: false
     description: Additional command line arguments for the `dcover clean` command.
