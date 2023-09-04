@@ -230,7 +230,7 @@ function create(status) {
         core.startGroup('Create');
         const createArgs = ['create', '--batch'];
         const patchFile = core.getInput('patch');
-        if (patchFile === '' || isBaseline()) {
+        if (patchFile === '' || (yield isBaseline())) {
             yield exec.exec('dcover', [
                 ...createArgs,
                 ...workingDirectoryArgs(),
@@ -262,7 +262,7 @@ function create(status) {
             if (reportName === '' || reportName === '/') {
                 reportName = '(root module)';
             }
-            status.reports.set(reportName, report);
+            status.reports[reportName] = report;
         }
         (0, status_io_1.saveStatus)(status);
         core.endGroup();
@@ -284,20 +284,22 @@ exports.cleanup = cleanup;
  * @returns `true` if no baseline marker exists.
  */
 function isBaseline() {
-    let baselineFile;
-    const workingDirectory = core.getInput('working-directory');
-    if (workingDirectory) {
-        baselineFile = `${workingDirectory}/.diffblue-baseline-marker`;
-    }
-    else {
-        baselineFile = `.diffblue-baseline-marker`;
-    }
-    const baseline = !fs.existsSync(baselineFile);
-    if (baseline) {
-        fs.writeFileSync(baselineFile, 'This file indicates that baseline tests have been created for this module\n');
-        exec.exec('git', ['add', baselineFile]);
-    }
-    return baseline;
+    return __awaiter(this, void 0, void 0, function* () {
+        let baselineFile;
+        const workingDirectory = core.getInput('working-directory');
+        if (workingDirectory) {
+            baselineFile = `${workingDirectory}/.diffblue-baseline-marker`;
+        }
+        else {
+            baselineFile = `.diffblue-baseline-marker`;
+        }
+        const baseline = !fs.existsSync(baselineFile);
+        if (baseline) {
+            fs.writeFileSync(baselineFile, 'This file indicates that baseline tests have been created for this module\n');
+            yield git.add([baselineFile]);
+        }
+        return baseline;
+    });
 }
 exports.isBaseline = isBaseline;
 /**
@@ -396,15 +398,35 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.push = exports.commit = void 0;
+exports.push = exports.commit = exports.add = void 0;
 const exec = __importStar(__nccwpck_require__(1514));
+const github = __importStar(__nccwpck_require__(5438));
 /**
- * Runs `git commit` to commit modified files.
+ * Runs `git add` to add modified files,
+ * if responding to a pull_request event.
+ *
+ * @param files  the paths to add.
+ */
+function add(files) {
+    return __awaiter(this, void 0, void 0, function* () {
+        if (github.context.eventName !== 'pull_request') {
+            return;
+        }
+        yield exec.exec('git', ['add', ...files]);
+    });
+}
+exports.add = add;
+/**
+ * Runs `git commit` to commit modified files,
+ * if responding to a pull_request event.
  *
  * @param status the status to be updated and saved.
  */
 function commit(status, message) {
     return __awaiter(this, void 0, void 0, function* () {
+        if (github.context.eventName !== 'pull_request') {
+            return;
+        }
         const result = yield exec.getExecOutput('git', [
             'status',
             '--untracked-files=all',
@@ -425,12 +447,16 @@ function commit(status, message) {
 }
 exports.commit = commit;
 /**
- * Runs `git push` to push changes up.
+ * Runs `git push` to push changes up,
+ * if responding to a pull_request event.
  *
  * @param status the status to be updated and saved.
  */
 function push(status) {
     return __awaiter(this, void 0, void 0, function* () {
+        if (github.context.eventName !== 'pull_request') {
+            return;
+        }
         yield exec.exec('git', ['push', 'origin', `HEAD:${status.ref}`]);
     });
 }
@@ -676,7 +702,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.skipOwnCommits = exports.skipDependabot = exports.skipEventType = exports.skip = void 0;
+exports.skipOwnCommits = exports.skipDependabot = exports.skip = void 0;
 const core = __importStar(__nccwpck_require__(2186));
 const exec = __importStar(__nccwpck_require__(1514));
 const github = __importStar(__nccwpck_require__(5438));
@@ -689,10 +715,7 @@ function skip() {
         core.startGroup('Checking whether to skip');
         let result = false;
         try {
-            result =
-                (yield skipEventType()) ||
-                    (yield skipDependabot()) ||
-                    (yield skipOwnCommits());
+            result = (yield skipDependabot()) || (yield skipOwnCommits());
         }
         catch (e) {
             if (e instanceof Error) {
@@ -708,20 +731,6 @@ function skip() {
     });
 }
 exports.skip = skip;
-/**
- * @returns `true` iff the action should be skipped due to the event type.
- */
-function skipEventType() {
-    return __awaiter(this, void 0, void 0, function* () {
-        const eventName = github.context.eventName;
-        const result = eventName !== 'pull_request';
-        if (result) {
-            core.info(`Skipping event type: ${eventName}`);
-        }
-        return result;
-    });
-}
-exports.skipEventType = skipEventType;
 /**
  * @returns `true` iff the event was sourced from dependabot
  */
@@ -759,7 +768,7 @@ function configuredAuthor() {
         const configName = (yield exec.getExecOutput('git', ['config', '--get', 'user.name'])).stdout.trim();
         const configEmail = (yield exec.getExecOutput('git', ['config', '--get', 'user.email'])).stdout.trim();
         if (configName === '' || configEmail === '') {
-            new Error('Please configure git user.name and user.email');
+            throw new Error('Please configure git user.name and user.email');
         }
         return `${configName} <${configEmail}>`;
     });
@@ -768,19 +777,21 @@ function configuredAuthor() {
  * @returns the name and email address of the HEAD commit author, if known.
  */
 function headCommitAuthor() {
-    var _a, _b, _c, _d;
+    var _a, _b, _c, _d, _e;
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const sha = ((_b = (_a = github.context.payload.pull_request) === null || _a === void 0 ? void 0 : _a.head) === null || _b === void 0 ? void 0 : _b.sha) || '';
             const [owner, repo] = process.env.GITHUB_REPOSITORY.split('/');
+            const sha = ((_b = (_a = github.context.payload.pull_request) === null || _a === void 0 ? void 0 : _a.head) === null || _b === void 0 ? void 0 : _b.sha) ||
+                ((_c = github.context.payload.push) === null || _c === void 0 ? void 0 : _c.after) ||
+                '';
             const octokit = new action_1.Octokit();
             const commit = yield octokit.rest.repos.getCommit({
                 owner,
                 repo,
                 ref: sha
             });
-            const authorName = (_c = commit.data.commit.author) === null || _c === void 0 ? void 0 : _c.name;
-            const authorEmail = (_d = commit.data.commit.author) === null || _d === void 0 ? void 0 : _d.email;
+            const authorName = (_d = commit.data.commit.author) === null || _d === void 0 ? void 0 : _d.name;
+            const authorEmail = (_e = commit.data.commit.author) === null || _e === void 0 ? void 0 : _e.email;
             return `${authorName} <${authorEmail}>`;
         }
         catch (error) {
@@ -833,6 +844,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.saveStatus = exports.readStatus = void 0;
 const io = __importStar(__nccwpck_require__(7436));
 const core = __importStar(__nccwpck_require__(2186));
+const github = __importStar(__nccwpck_require__(5438));
 const action_1 = __nccwpck_require__(1231);
 const fs_1 = __nccwpck_require__(7147);
 const status_model_1 = __nccwpck_require__(2023);
@@ -901,12 +913,16 @@ function saveStatus(status) {
 }
 exports.saveStatus = saveStatus;
 /**
- * Create or update a comment based on the given status.
+ * Create or update a comment based on the given status,
+ * if responding to a pull_request event.
  * @param octokit The GitHub API client.
  * @param status The status message identifying the anchor comment.
  */
 function createOrUpdateComment(octokit, status) {
     return __awaiter(this, void 0, void 0, function* () {
+        if (github.context.eventName !== 'pull_request') {
+            return;
+        }
         try {
             if (status.comment_id) {
                 const resp = yield octokit.rest.issues.updateComment({
@@ -1184,7 +1200,8 @@ function markdownErrorLines(status) {
  * @returns lines of markdown content showing reports information
  */
 function markdownReportsLines(status) {
-    if (status.reports.size === 0) {
+    const names = Object.keys(status.reports);
+    if (names.length === 0) {
         return [];
     }
     else {
@@ -1193,8 +1210,8 @@ function markdownReportsLines(status) {
             `| Report | Classes | Methods | Tests |`,
             `|:-------|--------:|--------:|------:|`
         ];
-        for (const name of Object.keys(status.reports)) {
-            const report = status.reports.get(name) || {};
+        for (const name of names) {
+            const report = status.reports[name];
             table.push(`| ${name} | ${report.summary.classesCount} | ${report.summary.methodsCount} | ${report.summary.completeTestCount} |`);
         }
         table.push(``);
@@ -1260,7 +1277,7 @@ class Status {
         /**
          * Report summaries from any complete `dcover create` runs
          */
-        this.reports = new Map();
+        this.reports = {};
         const [owner, repo] = process.env.GITHUB_REPOSITORY.split('/');
         this.owner = owner;
         this.repo = repo;
