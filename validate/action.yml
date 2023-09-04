@@ -5,9 +5,6 @@ inputs:
   working-directory:
     required: false
     description: The working directory to pass to `dcover` comamnds that accept a `--working-directory` argument.
-  commit-and-push:
-    required: false
-    description: 'true' or '' if the commands should commit and push changes back to the branch.
   validate-args:
     required: false
     description: Additional command line arguments for the `dcover validate` command.
