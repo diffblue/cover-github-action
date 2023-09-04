@@ -39,13 +39,15 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Prepare Git Author
-        # Adding commits to the branch requires an author name and email address.
+        # Diffblue Cover requires author name and email to be configured.
+        # This allows adding new commits, and detecting previous automated commits.
         run: |
           git config user.name "Diffblue CI"
           git config user.email "db-ci-platform@diffblue.com"
 
       - name: Prepare Git Patch
-        # Adding commits to the branch requires an author name and email address.
+        # Adding commits to the pull requst requires an author name and email address.
+        if: github.event_name == 'pull_request'
         run: |
           mkdir .diffblue
           git fetch origin ${{ github.event.pull_request.base.ref }} --depth 100
