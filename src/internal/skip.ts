@@ -16,10 +16,7 @@ export async function skip(): Promise<boolean> {
   core.startGroup('Checking whether to skip')
   let result = false
   try {
-    result =
-      (await skipEventType()) ||
-      (await skipDependabot()) ||
-      (await skipOwnCommits())
+    result = (await skipDependabot()) || (await skipOwnCommits())
   } catch (e) {
     if (e instanceof Error) {
       core.setFailed(e)
@@ -29,18 +26,6 @@ export async function skip(): Promise<boolean> {
     result = true
   }
   core.endGroup()
-  return result
-}
-
-/**
- * @returns `true` iff the action should be skipped due to the event type.
- */
-export async function skipEventType(): Promise<boolean> {
-  const eventName = github.context.eventName
-  const result = eventName !== 'pull_request'
-  if (result) {
-    core.info(`Skipping event type: ${eventName}`)
-  }
   return result
 }
 
@@ -91,8 +76,11 @@ async function configuredAuthor(): Promise<string> {
  */
 async function headCommitAuthor(): Promise<string | undefined> {
   try {
-    const sha = github.context.payload.pull_request?.head?.sha || ''
     const [owner, repo] = process.env.GITHUB_REPOSITORY.split('/')
+    const sha =
+      github.context.payload.pull_request?.head?.sha ||
+      github.context.payload.push?.after ||
+      ''
     const octokit = new Octokit()
     const commit = await octokit.rest.repos.getCommit({
       owner,
