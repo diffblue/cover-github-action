@@ -111,12 +111,12 @@ export async function createPreFlight(status: Status): Promise<void> {
  */
 export async function create(status: Status): Promise<void> {
   core.startGroup('Create')
+  const createArgs = ['create', '--batch']
 
   const patchFile = core.getInput('patch')
   if (patchFile === '' || isBaseline()) {
     await exec.exec('dcover', [
-      'create',
-      '--batch',
+      ...createArgs,
       ...workingDirectoryArgs(),
       ...coverReportsArgs(status),
       ...extraArgs('create-args')
@@ -124,11 +124,9 @@ export async function create(status: Status): Promise<void> {
     await git.commit(status, 'Baseline tests from Diffblue Cover')
   } else {
     await exec.exec('dcover', [
-      'create',
-      '--batch',
-      '--patch-only',
-      path.resolve(patchFile),
+      ...createArgs,
       ...workingDirectoryArgs(),
+      ...patchOnlyArgs(patchFile),
       ...extraArgs('create-args')
     ])
     await git.commit(status, 'Updated tests from Diffblue Cover')
@@ -220,6 +218,17 @@ function coverReportsArgs(status: Status): string[] {
     `--project`,
     `${status.owner}.${status.repo}`
   ]
+}
+
+/**
+ * @param patchFile the path to the patch file.
+ * @returns the `--patch-only` arguments, or an empty array if the given patch file is empty.
+ */
+function patchOnlyArgs(patchFile: string): string[] {
+  if (patchFile === '') {
+    return []
+  }
+  return ['--patch-only', path.resolve(patchFile)]
 }
 
 /**
