@@ -114,7 +114,7 @@ jobs:
           topic-id-differentiator: ${{ matrix.os }}
       
       - name: Git Push
-        if: ${{ github.actor != 'dependabot[bot]' }}
+        if: ${{ github.event_name == 'pull_request' && github.actor != 'dependabot[bot]' }}
         run: git push origin HEAD:${{ github.event.pull_request.head.ref }}
 
       - name: Diffblue Cover (summary)
