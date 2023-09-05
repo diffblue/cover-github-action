@@ -66,7 +66,7 @@ async function configuredAuthor(): Promise<string> {
     await exec.getExecOutput('git', ['config', '--get', 'user.email'])
   ).stdout.trim()
   if (configName === '' || configEmail === '') {
-    new Error('Please configure git user.name and user.email')
+    throw new Error('Please configure git user.name and user.email')
   }
   return `${configName} <${configEmail}>`
 }
