@@ -1,5 +1,6 @@
 import * as io from '@actions/io'
 import * as core from '@actions/core'
+import * as github from '@actions/github'
 import {Octokit} from '@octokit/action'
 import {readFileSync, writeFileSync} from 'fs'
 import {Status} from './status-model'
@@ -68,7 +69,8 @@ export async function saveStatus(status: Status): Promise<void> {
 }
 
 /**
- * Create or update a comment based on the given status.
+ * Create or update a comment based on the given status,
+ * if responding to a pull_request event.
  * @param octokit The GitHub API client.
  * @param status The status message identifying the anchor comment.
  */
@@ -76,6 +78,9 @@ async function createOrUpdateComment(
   octokit: Octokit,
   status: Status
 ): Promise<void> {
+  if (github.context.eventName !== 'pull_request') {
+    return
+  }
   try {
     if (status.comment_id) {
       const resp = await octokit.rest.issues.updateComment({

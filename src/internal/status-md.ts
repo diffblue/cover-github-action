@@ -1,4 +1,4 @@
-import {Report, Status} from './status-model'
+import {Status} from './status-model'
 
 /**
  * @param status the status to render as markdown
@@ -102,7 +102,8 @@ function markdownErrorLines(status: Status): string[] {
  * @returns lines of markdown content showing reports information
  */
 function markdownReportsLines(status: Status): string[] {
-  if (status.reports.size === 0) {
+  const names = Object.keys(status.reports)
+  if (names.length === 0) {
     return []
   } else {
     const table = [
@@ -110,8 +111,8 @@ function markdownReportsLines(status: Status): string[] {
       `| Report | Classes | Methods | Tests |`,
       `|:-------|--------:|--------:|------:|`
     ]
-    for (const name of Object.keys(status.reports)) {
-      const report = status.reports.get(name) || ({} as Report)
+    for (const name of names) {
+      const report = status.reports[name]
       table.push(
         `| ${name} | ${report.summary.classesCount} | ${report.summary.methodsCount} | ${report.summary.completeTestCount} |`
       )

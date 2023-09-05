@@ -61,7 +61,7 @@ export class Status {
   /**
    * Report summaries from any complete `dcover create` runs
    */
-  reports: Map<string, Report> = new Map()
+  reports: {[id: string]: Report} = {}
 
   constructor() {
     const [owner, repo] = process.env.GITHUB_REPOSITORY.split('/')
