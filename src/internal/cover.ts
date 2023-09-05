@@ -149,7 +149,7 @@ export async function create(status: Status): Promise<void> {
     if (reportName === '' || reportName === '/') {
       reportName = '(root module)'
     }
-    status.reports.set(reportName, report)
+    status.reports[reportName] = report
   }
   saveStatus(status)
   core.endGroup()
