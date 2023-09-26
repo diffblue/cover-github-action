@@ -34,7 +34,7 @@
     "@octokit/graphql": "^7.0.1"
   },
   "devDependencies": {
-    "@types/jest": "^29.5.4",
+    "@types/jest": "^29.5.5",
     "@types/node": "^20.7.0",
     "@typescript-eslint/parser": "^5.62.0",
     "@vercel/ncc": "^0.38.0",
