@@ -54,7 +54,7 @@ jobs:
 
       # If index.js was different than expected, upload the expected version as an artifact
       - name: Upload "Check Package" Artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: ${{ failure() && steps.diff.conclusion == 'failure' }}
         with:
           name: dist
