@@ -116,14 +116,3 @@ jobs:
       - name: Git Push
         if: ${{ github.event_name == 'pull_request' && github.actor != 'dependabot[bot]' }}
         run: git push origin HEAD:${{ github.event.pull_request.head.ref }}
-
-      - name: Diffblue Cover (summary)
-        uses: ./summary/
-        env:
-          GITHUB_TOKEN: ${{ secrets.DIFFBLUE_TOKEN }}
-          JVM_ARGS: -Xmx4096m
-        with:
-          # Integration test project lives in a subdir
-          working-directory: ./test/gradle-project
-          # Add a differentiator based on the matrix
-          topic-id-differentiator: ${{ matrix.os }}

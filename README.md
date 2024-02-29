@@ -46,7 +46,6 @@ For custom or complex workflows there are also a collection of component actions
 - `diffblue/cover-github-action/clean@main` - runs `dcover clean`.
 - `diffblue/cover-github-action/validate@main` - runs `dcover validate`.
 - `diffblue/cover-github-action/create@main` - runs `dcover create`.
-- `diffblue/cover-github-action/summary@main` - posts a summary to the GitHub workflow.
 
 The actions only supports `pull_request` events, and will do nothing for if run under other events.
 

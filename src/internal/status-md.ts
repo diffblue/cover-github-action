@@ -20,21 +20,6 @@ export function markdownComment(status: Status): string {
 
 /**
  * @param status the status to render as markdown
- * @returns this status rendered to markdown for use in a job summary
- */
-export function markdownSummary(status: Status): string {
-  return [
-    ...markdownHeaderLines(status),
-    ...markdownVersionLines(status),
-    ...markdownCoverReportsLines(status),
-    ...markdownErrorLines(status),
-    ...markdownReportsLines(status),
-    ``
-  ].join('\n')
-}
-
-/**
- * @param status the status to render as markdown
  * @returns lines of markdown heading content
  */
 function markdownHeaderLines(status: Status): string[] {
