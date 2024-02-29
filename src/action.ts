@@ -14,7 +14,6 @@ async function run(): Promise<void> {
   const status = await readStatus()
   try {
     await cover.install(status)
-    await cover.activate()
   } catch (error) {
     status.error = error
     if (error instanceof Error) {
