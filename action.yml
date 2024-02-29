@@ -31,6 +31,7 @@ runs:
         DIFFBLUE_LICENSE_KEY: ${{ inputs.license-key }}
         DIFFBLUE_WORKING_DIRECTORY: ${{ inputs.working-directory }} 
         DIFFBLUE_ACCESS_TOKEN: ${{ inputs.access-token }}
-      run: dcover ${{ inputs.args }}
-
-
+      working-directory: ${{ inputs.working-directory }}
+      run: >
+        env | sort
+        dcover ${{ inputs.args }}
