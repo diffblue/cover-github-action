@@ -30,8 +30,6 @@ async function run(): Promise<void> {
       }
     }
   }
-
-  await cover.cleanup()
 }
 
 run()

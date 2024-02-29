@@ -25,7 +25,6 @@ async function run(): Promise<void> {
   }
 
   await saveStatus(status)
-  await cover.cleanup()
 }
 
 run()
