@@ -42,16 +42,3 @@ export async function commit(status: Status, message: string): Promise<void> {
     await exec.exec('git', ['commit', '--message', message])
   }
 }
-
-/**
- * Runs `git push` to push changes up,
- * if responding to a pull_request event.
- *
- * @param status the status to be updated and saved.
- */
-export async function push(status: Status): Promise<void> {
-  if (github.context.eventName !== 'pull_request') {
-    return
-  }
-  await exec.exec('git', ['push', 'origin', `HEAD:${status.ref}`])
-}

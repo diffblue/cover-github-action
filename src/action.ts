@@ -1,5 +1,4 @@
 import * as core from '@actions/core'
-import * as git from './internal/git'
 import * as cover from './internal/cover'
 import {skip} from './internal/skip'
 import {readStatus} from './internal/status-io'
@@ -20,7 +19,6 @@ async function run(): Promise<void> {
     await cover.validate(status)
     await cover.createPreFlight(status)
     await cover.create(status)
-    await git.push(status)
   } catch (error) {
     status.error = error
     if (error instanceof Error) {
