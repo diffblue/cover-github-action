@@ -32,6 +32,6 @@ runs:
         DIFFBLUE_WORKING_DIRECTORY: ${{ inputs.working-directory }} 
         DIFFBLUE_ACCESS_TOKEN: ${{ inputs.access-token }}
       working-directory: ${{ inputs.working-directory }}
-      run: >-
+      run: |
         env | sort
         dcover ${{ inputs.args }}
