@@ -44,7 +44,6 @@ For custom or complex workflows there are also a collection of component actions
 - `diffblue/cover-github-action/install@main` - installs the `dcover` command into the `PATH`.
 - `diffblue/cover-github-action/activate@main` - runs `dcover activate`.
 - `diffblue/cover-github-action/clean@main` - runs `dcover clean`.
-- `diffblue/cover-github-action/validate@main` - runs `dcover validate`.
 
 The actions only supports `pull_request` events, and will do nothing for if run under other events.
 

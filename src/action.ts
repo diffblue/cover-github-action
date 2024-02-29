@@ -16,7 +16,6 @@ async function run(): Promise<void> {
     await cover.install(status)
     await cover.activate()
     await cover.clean(status)
-    await cover.validate(status)
     await cover.createPreFlight(status)
   } catch (error) {
     status.error = error
