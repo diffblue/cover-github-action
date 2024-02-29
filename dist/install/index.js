@@ -102,44 +102,19 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.isBaseline = exports.install = void 0;
-const core = __importStar(__nccwpck_require__(2186));
+exports.install = void 0;
 const exec = __importStar(__nccwpck_require__(1514));
-const fs = __importStar(__nccwpck_require__(7147));
 const install_latest_version_1 = __nccwpck_require__(8292);
 /**
  * Installs `dcover` for use by other commands and functions.
  */
 function install() {
     return __awaiter(this, void 0, void 0, function* () {
-        core.startGroup('Install');
         yield (0, install_latest_version_1.installLatestVersion)();
         yield exec.exec('dcover', ['--version']);
-        core.endGroup();
     });
 }
 exports.install = install;
-/**
- * @returns `true` if no baseline marker exists.
- */
-function isBaseline() {
-    return __awaiter(this, void 0, void 0, function* () {
-        let baselineFile;
-        const workingDirectory = core.getInput('working-directory');
-        if (workingDirectory) {
-            baselineFile = `${workingDirectory}/.diffblue-baseline-marker`;
-        }
-        else {
-            baselineFile = `.diffblue-baseline-marker`;
-        }
-        const baseline = !fs.existsSync(baselineFile);
-        if (baseline) {
-            fs.writeFileSync(baselineFile, 'This file indicates that baseline tests have been created for this module\n');
-        }
-        return baseline;
-    });
-}
-exports.isBaseline = isBaseline;
 
 
 /***/ }),
