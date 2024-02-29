@@ -1,7 +1,6 @@
 import * as core from '@actions/core'
 import * as cover from './internal/cover'
 import {skip} from './internal/skip'
-import {readStatus, saveStatus} from './internal/status-io'
 
 /**
  * Runs the "install" isolated action.
@@ -11,11 +10,9 @@ async function run(): Promise<void> {
     return
   }
 
-  const status = await readStatus()
   try {
-    await cover.install(status)
+    await cover.install()
   } catch (error) {
-    status.error = error
     if (error instanceof Error) {
       core.setFailed(error.message)
       if (error.stack) {
@@ -23,8 +20,6 @@ async function run(): Promise<void> {
       }
     }
   }
-
-  await saveStatus(status)
 }
 
 run()

@@ -1,7 +1,6 @@
 import * as core from '@actions/core'
 import * as cover from './internal/cover'
 import {skip} from './internal/skip'
-import {readStatus} from './internal/status-io'
 
 /**
  * Runs the "batteries included" combined action.
@@ -11,11 +10,9 @@ async function run(): Promise<void> {
     return
   }
 
-  const status = await readStatus()
   try {
-    await cover.install(status)
+    await cover.install()
   } catch (error) {
-    status.error = error
     if (error instanceof Error) {
       core.setFailed(error.message)
       if (error.stack) {
