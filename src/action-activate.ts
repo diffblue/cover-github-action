@@ -1,7 +1,6 @@
 import * as core from '@actions/core'
 import * as cover from './internal/cover'
 import {skip} from './internal/skip'
-import {upload} from './internal/upload'
 import {readStatus, saveStatus} from './internal/status-io'
 
 /**
@@ -27,7 +26,6 @@ async function run(): Promise<void> {
 
   await saveStatus(status)
   await cover.cleanup()
-  await upload(status)
 }
 
 run()

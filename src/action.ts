@@ -2,7 +2,6 @@ import * as core from '@actions/core'
 import * as git from './internal/git'
 import * as cover from './internal/cover'
 import {skip} from './internal/skip'
-import {upload} from './internal/upload'
 import {readStatus} from './internal/status-io'
 
 /**
@@ -33,7 +32,6 @@ async function run(): Promise<void> {
   }
 
   await cover.cleanup()
-  await upload(status)
 }
 
 run()
