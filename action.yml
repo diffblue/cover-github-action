@@ -33,5 +33,6 @@ runs:
         DIFFBLUE_ACCESS_TOKEN: ${{ inputs.access-token }}
       working-directory: ${{ inputs.working-directory }}
       run: |
+        pwd
         env | sort
         dcover ${{ inputs.args }}
