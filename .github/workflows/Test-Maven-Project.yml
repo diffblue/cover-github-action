@@ -41,6 +41,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.DIFFBLUE_TOKEN }}
           JVM_ARGS: -Xmx4096m
         with:
+          # Access token used to push commits call APIs
+          access-token: ${{ secrets.DIFFBLUE_TOKEN }}
           # License key used to activate the installation
           license-key: ${{ secrets.DIFFBLUE_LICENSE_KEY }}
           # Integration test project lives in a subdir
