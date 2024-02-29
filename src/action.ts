@@ -15,7 +15,6 @@ async function run(): Promise<void> {
   try {
     await cover.install(status)
     await cover.activate()
-    await cover.clean(status)
   } catch (error) {
     status.error = error
     if (error instanceof Error) {

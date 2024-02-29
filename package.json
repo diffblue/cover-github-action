@@ -9,7 +9,7 @@
     "format": "prettier --write '**/*.ts'",
     "format-check": "prettier --check '**/*.ts'",
     "lint": "eslint src/**/*.ts",
-    "package": "ncc build --source-map --license licenses.txt && ncc build --source-map --license licenses.txt lib/action-install.js --out dist/install/ && ncc build --source-map --license licenses.txt lib/action-activate.js --out dist/activate/ && ncc build --source-map --license licenses.txt lib/action-clean.js --out dist/clean/",
+    "package": "ncc build --source-map --license licenses.txt && ncc build --source-map --license licenses.txt lib/action-install.js --out dist/install/ && ncc build --source-map --license licenses.txt lib/action-activate.js --out dist/activate/",
     "test": "jest --coverage",
     "all": "npm run build && npm run format && npm run lint && npm run package && npm test"
   },

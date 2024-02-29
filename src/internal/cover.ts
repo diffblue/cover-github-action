@@ -4,7 +4,6 @@ import {installLatestVersion} from './install-latest-version'
 import {Status} from './status-model'
 import {saveStatus} from './status-io'
 
-
 /**
  * Installs `dcover` for use by other commands and functions.
  *
@@ -36,43 +35,4 @@ export async function activate(): Promise<void> {
   }
   await exec.exec('dcover', ['activate', keyValue])
   core.endGroup()
-}
-
-/**
- * Runs `dcover clean`.
- *
- * @param status the status to be updated and saved.
- */
-export async function clean(status: Status): Promise<void> {
-  core.startGroup('Clean')
-  await exec.exec('dcover', [
-    'clean',
-    '--batch',
-    ...workingDirectoryArgs(),
-    ...extraArgs('clean-args')
-  ])
-  core.endGroup()
-}
-
-/**
- * @returns the `--working-directory` arguments based on `working-directory` input, or an empty array.
- */
-function workingDirectoryArgs(): string[] {
-  const workingDirectory = core.getInput('working-directory')
-  if (workingDirectory) {
-    return ['--working-directory', workingDirectory]
-  } else {
-    return []
-  }
-}
-
-/**
- * @param input the name of the extra-args input to split.
- * @returns the extra arguments split on spaces, or an empty array.
- */
-function extraArgs(input: string): string[] {
-  return core
-    .getInput(input)
-    .split(/\s+/)
-    .filter(arg => arg !== '')
 }
