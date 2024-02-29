@@ -100,79 +100,6 @@ export async function createPreFlight(status: Status): Promise<void> {
 }
 
 /**
- * Runs `dcover create`.
- *
- * @param status the status to be updated and saved.
- */
-export async function create(status: Status): Promise<void> {
-  core.startGroup('Create')
-  const createArgs = ['create', '--batch']
-
-  const patchFile = core.getInput('patch')
-  if (patchFile === '' || (await isBaseline())) {
-    await exec.exec('dcover', [
-      ...createArgs,
-      ...workingDirectoryArgs(),
-      ...coverReportsArgs(status),
-      ...extraArgs('create-args')
-    ])
-  } else {
-    await exec.exec('dcover', [
-      ...createArgs,
-      ...workingDirectoryArgs(),
-      ...patchOnlyArgs(patchFile),
-      ...extraArgs('create-args')
-    ])
-  }
-
-  const globber = await glob.create('**/.diffblue/reports/report.json')
-  const reportFiles: string[] = await globber.glob()
-  for (const reportFile of reportFiles) {
-    const report = JSON.parse(readFileSync(reportFile, 'utf8')) as Report
-    let reportName = reportFile
-    if (reportName.startsWith(process.env.GITHUB_WORKSPACE)) {
-      reportName = reportName.substring(process.env.GITHUB_WORKSPACE.length)
-    }
-    reportName = reportName.substring(
-      0,
-      reportName.length - '/.diffblue/reports/report.json'.length
-    )
-    reportName = reportName.replace(/\\/g, '/')
-    reportName = reportName.replace(/^\/+/g, '')
-    if (reportName === '' || reportName === '/') {
-      reportName = '(root module)'
-    }
-    status.reports[reportName] = report
-  }
-  saveStatus(status)
-  core.endGroup()
-}
-
-/**
- * @returns `true` if no baseline marker exists.
- */
-export async function isBaseline(): Promise<boolean> {
-  let baselineFile: string
-  const workingDirectory = core.getInput('working-directory')
-  if (workingDirectory) {
-    baselineFile = `${workingDirectory}/.diffblue-baseline-marker`
-  } else {
-    baselineFile = `.diffblue-baseline-marker`
-  }
-
-  const baseline = !fs.existsSync(baselineFile)
-
-  if (baseline) {
-    fs.writeFileSync(
-      baselineFile,
-      'This file indicates that baseline tests have been created for this module\n'
-    )
-  }
-
-  return baseline
-}
-
-/**
  * @returns the `--working-directory` arguments based on `working-directory` input, or an empty array.
  */
 function workingDirectoryArgs(): string[] {
@@ -207,17 +134,6 @@ function coverReportsArgs(status: Status): string[] {
     `--project`,
     `${status.owner}.${status.repo}`
   ]
-}
-
-/**
- * @param patchFile the path to the patch file.
- * @returns the `--patch-only` arguments, or an empty array if the given patch file is empty.
- */
-function patchOnlyArgs(patchFile: string): string[] {
-  if (patchFile === '') {
-    return []
-  }
-  return ['--patch-only', path.resolve(patchFile)]
 }
 
 /**

@@ -18,7 +18,6 @@ async function run(): Promise<void> {
     await cover.clean(status)
     await cover.validate(status)
     await cover.createPreFlight(status)
-    await cover.create(status)
   } catch (error) {
     status.error = error
     if (error instanceof Error) {
