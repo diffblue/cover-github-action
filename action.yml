@@ -1,34 +1,36 @@
 name: Diffblue Cover
-description: Runs Diffblue Cover in "batteries included" mode, ideal for single module projects.
+description: Runs Diffblue Cover to automatically write and maintain Java unit tests.
 author: Diffblue
 inputs:
   license-key:
     required: true
-    description: The license key provided in your welcome email or provided by your organization
+    description: The license key provided in your welcome email or provided by your organization.
+  access-token:
+    required: true
+    description: The access token used to push commits and call GitHub APIs.
+  args:
+    required: false
+    description: The Diffblue Cover command line arguments. 
+    default: >-
+      ci
+      activate
+      validate
+      create
   working-directory:
     required: false
     description: The working directory to pass to `dcover` comamnds that accept a `--working-directory` argument.
-  patch:
-    required: false
-    description: The patch file representing the changes in the current pull request.
-  cover-reports-url:
-    required: false
-    description: The URL where Cover Reports should be submitted to, if at all.
-  clean-args:
-    required: false
-    description: Additional command line arguments for the `dcover clean` command.
-  validate-args:
-    required: false
-    description: Additional command line arguments for the `dcover validate` command.
-  create-args:
-    required: false
-    description: Additional command line arguments for the `dcover create` command.
-  refactor-args:
-    required: false
-    description: Additional command line arguments for the `dcover refactor` command.
-  topic-id-differentiator:
-    required: false
-    description: Optional string to differentiate multiple uses of the actions within a single workflow.
+    default: .
 runs:
-  using: node16
-  main: dist/index.js
+  using: composite
+  steps:
+    - name: Install
+      uses: ./install/
+    - name: Execute
+      shell: bash
+      env:
+        DIFFBLUE_LICENSE_KEY: ${{ inputs.license-key }}
+        DIFFBLUE_WORKING_DIRECTORY: ${{ inputs.working-directory }} 
+        DIFFBLUE_ACCESS_TOKEN: ${{ inputs.access-token }}
+      run: dcover ${{ inputs.args }}
+
+
