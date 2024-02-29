@@ -3,7 +3,6 @@ import * as core from '@actions/core'
 import * as exec from '@actions/exec'
 import * as fs from 'fs'
 import * as path from 'path'
-import * as git from './git'
 import {installLatestVersion} from './install-latest-version'
 import {Report, Status} from './status-model'
 import {saveStatus} from './status-io'
@@ -61,7 +60,6 @@ export async function clean(status: Status): Promise<void> {
     ...workingDirectoryArgs(),
     ...extraArgs('clean-args')
   ])
-  await git.commit(status, 'Removed non-compiling Diffblue tests')
   core.endGroup()
 }
 
@@ -78,7 +76,6 @@ export async function validate(status: Status): Promise<void> {
     ...workingDirectoryArgs(),
     ...extraArgs('validate-args')
   ])
-  await git.commit(status, 'Removed failing Diffblue tests')
   core.endGroup()
 }
 
@@ -99,7 +96,6 @@ export async function createPreFlight(status: Status): Promise<void> {
     ...coverReportsArgs(status),
     ...extraArgs('create-args')
   ])
-  await git.commit(status, 'Fixed build for use with Diffblue Cover')
   core.endGroup()
 }
 
@@ -120,7 +116,6 @@ export async function create(status: Status): Promise<void> {
       ...coverReportsArgs(status),
       ...extraArgs('create-args')
     ])
-    await git.commit(status, 'Baseline tests from Diffblue Cover')
   } else {
     await exec.exec('dcover', [
       ...createArgs,
@@ -128,7 +123,6 @@ export async function create(status: Status): Promise<void> {
       ...patchOnlyArgs(patchFile),
       ...extraArgs('create-args')
     ])
-    await git.commit(status, 'Updated tests from Diffblue Cover')
   }
 
   const globber = await glob.create('**/.diffblue/reports/report.json')
@@ -173,7 +167,6 @@ export async function isBaseline(): Promise<boolean> {
       baselineFile,
       'This file indicates that baseline tests have been created for this module\n'
     )
-    await git.add([baselineFile])
   }
 
   return baseline
