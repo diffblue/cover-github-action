@@ -38,7 +38,7 @@ jobs:
       - name: Diffblue Cover
         uses: ./
         env:
-          GITHUB_TOKEN: ${{ secrets.DIFFBLUE_TOKEN }}
+          GITHUB_PR_NUMBER: ${{ github.event.number }}
           JVM_ARGS: -Xmx4096m
         with:
           # Access token used to push commits call APIs
