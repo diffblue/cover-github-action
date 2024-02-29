@@ -1,15 +1,10 @@
 import * as core from '@actions/core'
 import * as cover from './internal/cover'
-import {skip} from './internal/skip'
 
 /**
  * Runs the "install" isolated action.
  */
 async function run(): Promise<void> {
-  if (await skip()) {
-    return
-  }
-
   try {
     await cover.install()
   } catch (error) {
