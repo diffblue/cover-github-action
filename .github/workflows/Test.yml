@@ -1,25 +1,21 @@
-# Cover GitHub Action
+name: "Test"
 
-This project provides a GitHub Action for running Diffblue Cover.
-
-## Usage
-
-In it's simplest form the "batteries included" action is intended to be used in a workflow to run all things Diffblue Cover:
-
-```yaml
-name: Example Workflow
-
-# Diffblue Cover CI responds to pull request
 on:
   pull_request:
+  push:
+    branches:
+      - main
+      - 'releases/*'
 
 # Avoid running the same workflow on the same branch concurrently
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
 
 jobs:
-  DiffblueCover:
+
+  Test:
     runs-on: ubuntu-latest
+
     steps:
 
       # Checkout the repository with permission to push
@@ -56,7 +52,7 @@ jobs:
 
       # Run Diffblue Cover
       - name: Diffblue Cover
-        uses: diffblue/cover-github-action@main
+        uses: ./ # the latest version from the current repository
         env:
           JVM_ARGS: -Xmx4096m
           GITHUB_PR_NUMBER: ${{ github.event.number }}
@@ -67,19 +63,11 @@ jobs:
           # including code, commit-statuses, pull-requests, workflows and actions.
           access-token: ${{ secrets.DIFFBLUE_TOKEN }}
 
-          # The license key provided in your welcome email or provided by your organization.
-          # Alternatively obtain a free trial key from https://www.diffblue.com/try-cover/gitlab.
+          # License key used to activate the installation
           license-key: ${{ secrets.DIFFBLUE_LICENSE_KEY }}
 
-          # Working directory where the project can be found, if not at the root.
-          # working-directory: path/to/project
-
-          # The Diffblue Cover commands and options to use.
-          # args: >-
-          #   ci
-          #   activate
-          #   validate
-          #   create
+          # Integration test project lives in a subdir
+          working-directory: ./test
 
       # Collect Diffblue Cover log files
       - name: Diffblue Artifacts
@@ -88,4 +76,3 @@ jobs:
           name: logs
           path: |
             **/.diffblue/**
-```

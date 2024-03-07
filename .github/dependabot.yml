@@ -5,17 +5,7 @@ updates:
     schedule:
       interval: daily
 
-  - package-ecosystem: npm
-    directory: /
-    schedule:
-      interval: daily
-
   - package-ecosystem: maven
-    directory: /test
-    schedule:
-      interval: daily
-
-  - package-ecosystem: gradle
     directory: /test
     schedule:
       interval: daily
