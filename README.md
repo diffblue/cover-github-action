@@ -2,6 +2,11 @@
 
 This project provides a GitHub Action for running Diffblue Cover.
 
+- [Diffblue EULA](https://docs.diffblue.com/legal/diffblue-legal/diffblue-end-user-license-agreement-eula)
+- [Diffblue Privacy Notice](https://docs.diffblue.com/legal/diffblue-legal/privacy-notice)
+- [Request Diffblue trial license](https://www.diffblue.com/try-cover/github)
+
+
 ## Usage
 
 In it's simplest form the "batteries included" action is intended to be used in a workflow to run all things Diffblue Cover:
