@@ -46,12 +46,10 @@ jobs:
 
       # This job runs a Maven command to build the project.
       - name: Maven Install
-        working-directory: ./test
         run: mvn --batch-mode install
 
       # # This job runs a Gradle command to build the project.
       # - name: Gradle Build
-      #   working-directory: ./test
       #   run: ./gradlew --console plain build
 
       # Run Diffblue Cover
