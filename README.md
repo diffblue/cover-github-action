@@ -71,7 +71,7 @@ jobs:
           access-token: ${{ secrets.DIFFBLUE_TOKEN }}
 
           # The license key provided in your welcome email or provided by your organization.
-          # Alternatively obtain a free trial key from https://www.diffblue.com/try-cover/gitlab.
+          # Alternatively obtain a free trial key from https://www.diffblue.com/try-cover/github.
           license-key: ${{ secrets.DIFFBLUE_LICENSE_KEY }}
 
           # Working directory where the project can be found, if not at the root.
