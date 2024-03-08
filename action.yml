@@ -2,6 +2,9 @@ name: Diffblue Cover
 description:
   Runs Diffblue Cover to automatically write and maintain Java unit tests.
 author: Diffblue
+branding:
+  icon: check-circle
+  color: blue
 inputs:
   license-key:
     required: true
