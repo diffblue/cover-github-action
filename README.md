@@ -37,7 +37,7 @@ jobs:
           # Must have access to the project with at least Write role, and scopes
           # including code, commit-statuses, pull-requests, workflows and actions.
           #
-          token: ${{ secrets.DIFFBLUE_TOKEN }}
+          token: ${{ secrets.DIFFBLUE_ACCESS_TOKEN }}
 
       # Diffblue Cover requires the project to be built so that
       # the class files can be analysed and tests created.
@@ -68,7 +68,7 @@ jobs:
           #
           # Must have access to the project with at least Write role, and scopes
           # including code, commit-statuses, pull-requests, workflows and actions.
-          access-token: ${{ secrets.DIFFBLUE_TOKEN }}
+          access-token: ${{ secrets.DIFFBLUE_ACCESS_TOKEN }}
 
           # The license key provided in your welcome email or provided by your organization.
           # Alternatively obtain a free trial key from https://www.diffblue.com/try-cover/github.
