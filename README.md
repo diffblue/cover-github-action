@@ -6,6 +6,19 @@ This project provides a GitHub Action for running Diffblue Cover.
 - [Diffblue Privacy Notice](https://docs.diffblue.com/legal/diffblue-legal/privacy-notice)
 - [Request Diffblue trial license](https://www.diffblue.com/try-cover/github)
 
+## Variants
+
+Multiple variants of the docker action are available using different JDK versions.
+The base version currently uses JDK17 but this may change.
+In general it's recommended to specify the action with your chosen JDK:
+
+- `diffblue/cover-github-action@main`
+- `diffblue/cover-github-action/jdk8@main`
+- `diffblue/cover-github-action/jdk11@main`
+- `diffblue/cover-github-action/jdk17@main`
+- `diffblue/cover-github-action/jdk21@main`
+
+Variants are maintained using the `build.sh` script to ensure that they only vary by JDK from the base version.
 
 ## Usage
 
