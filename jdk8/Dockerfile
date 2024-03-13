@@ -1,7 +1,7 @@
 # Default to using the latest version of Diffblue Cover on JDK8
 # Additional images are available for specific Diffblue Cover
 # versions and JDK versions.
-FROM diffblue/cover-cli:latest-jdk8
+FROM diffblue/internal-cover-cli:nightly-jdk8
 
 # Copies your code file from your action repository to the filesystem path `/` of the container
 COPY entrypoint.sh /entrypoint.sh
