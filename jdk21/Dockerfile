@@ -1,7 +1,7 @@
 # Default to using the latest version of Diffblue Cover on JDK21
 # Additional images are available for specific Diffblue Cover
 # versions and JDK versions.
-FROM diffblue/cover-cli:latest-jdk21
+FROM diffblue/internal-cover-cli:roxspring-tg-21007-prepare-workspace-2024.03.01-snapshot-jdk21
 
 # Copies your code file from your action repository to the filesystem path `/` of the container
 COPY entrypoint.sh /entrypoint.sh
