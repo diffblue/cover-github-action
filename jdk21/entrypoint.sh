@@ -5,9 +5,6 @@ set -ex
 # Mark the workspace as safe
 /usr/bin/git config --system --add safe.directory `pwd`
 
-# Hmmmmm... fetch the next few refs just to get started
-git fetch --all --deepen=5
-
 # Reset the image-specific environment
 export $(cat /.env | xargs)
 
