@@ -27,6 +27,7 @@ inputs:
     default: >-
       ci
       activate
+      build
       validate
       create
   working-directory:
