@@ -52,24 +52,6 @@ jobs:
           #
           token: ${{ secrets.DIFFBLUE_ACCESS_TOKEN }}
 
-      # Diffblue Cover requires the project to be built so that
-      # the class files can be analysed and tests created.
-
-      # This job configures Java so that the project can be built.
-      - name: Setup Java
-        uses: actions/setup-java@v4
-        with:
-          java-version: '17'
-          distribution: 'zulu'
-
-      # This job runs a Maven command to build the project.
-      - name: Maven Install
-        run: mvn --batch-mode install
-
-      # # This job runs a Gradle command to build the project.
-      # - name: Gradle Build
-      #   run: ./gradlew --console plain build
-
       # Run Diffblue Cover
       - name: Diffblue Cover
         uses: diffblue/cover-github-action@main
@@ -94,6 +76,7 @@ jobs:
           # args: >-
           #   ci
           #   activate
+          #   build
           #   validate
           #   create
 
