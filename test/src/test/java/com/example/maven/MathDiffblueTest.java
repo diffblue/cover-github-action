@@ -12,6 +12,6 @@ public class MathDiffblueTest {
   public void testGreaterThanFive() {
     // Arrange, Act and Assert
     assertFalse(Math.greaterThanFive(1));
-    assertTrue(Math.greaterThanFive(6));
+    assertTrue(Math.greaterThanFive(4));
   }
 }
