@@ -49,7 +49,6 @@ jobs:
         uses: diffblue/cover-github-action@main
         env:
           JVM_ARGS: -Xmx4096m
-          GITHUB_PR_NUMBER: ${{ github.event.number }}
         with:
           # The access token used to push commits and call GitHub APIs.
           #
