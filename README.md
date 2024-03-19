@@ -54,7 +54,7 @@ jobs:
 
       # Run Diffblue Cover
       - name: Diffblue Cover
-        uses: diffblue/cover-github-action@main
+        uses: diffblue/cover-github-action@tigers/TG-21006-release-testing
         env:
           JVM_ARGS: -Xmx4096m
           GITHUB_PR_NUMBER: ${{ github.event.number }}
