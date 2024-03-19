@@ -72,6 +72,9 @@ jobs:
           #   create
 
       # Collect Diffblue Cover log files
+      # This job saves Diffblue Cover logs for later use. These include summary information on
+      # Diffblue Cover's results. The logs can also be used to improve analysis or troubleshoot
+      # problems.
       - name: Diffblue Artifacts
         uses: actions/upload-artifact@v4
         with:
