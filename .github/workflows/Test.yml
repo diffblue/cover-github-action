@@ -21,21 +21,12 @@ jobs:
       # Checkout the repository with permission to push
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          # The default GITHUB_TOKEN doesn't have the necessary permissions
-          # so a custom token should be used here with sufficient access.
-          #
-          # Must have access to the project with at least Write role, and scopes
-          # including code, commit-statuses, pull-requests, workflows and actions.
-          #
-          token: ${{ secrets.DIFFBLUE_ACCESS_TOKEN }}
 
       # Run Diffblue Cover
       - name: Diffblue Cover
         uses: ./ # the latest version from the current repository
         env:
           JVM_ARGS: -Xmx4096m
-          GITHUB_PR_NUMBER: ${{ github.event.number }}
         with:
           # The access token used to push commits and call GitHub APIs.
           #
