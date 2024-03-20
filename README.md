@@ -71,11 +71,15 @@ jobs:
           #   validate
           #   create
 
-      # Collect Diffblue Cover log files
-      # This job saves Diffblue Cover logs for later use. These include summary information on
-      # Diffblue Cover's results. The logs can also be used to improve analysis or troubleshoot
-      # problems.
+      # Collect Diffblue Cover outcome files
+      # This job saves Diffblue Cover run outcomes files for later use. These include summary
+      # information on Diffblue Cover's results, reports files, and logs. The information
+      # contained in these files be used for project analysis, metrics, improving analysis or
+      # troubleshooting problems.
+      # Note that this job will always run even when the Run Diffblue Cover job fails. This
+      # ensures troubleshooting logs and output are available.
       - name: Diffblue Artifacts
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: logs
