@@ -64,6 +64,8 @@ jobs:
           # working-directory: path/to/project
 
           # The Diffblue Cover commands and options to use.
+          # Below is the default behavior, uncomment these and edit to customize
+          # how Diffblue Cover is run on your project.
           #args: >-
           #  ci
           #  activate
