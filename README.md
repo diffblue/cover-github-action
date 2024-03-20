@@ -73,6 +73,7 @@ jobs:
 
       # Collect Diffblue Cover log files
       - name: Diffblue Artifacts
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: logs
