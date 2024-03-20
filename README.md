@@ -64,12 +64,12 @@ jobs:
           # working-directory: path/to/project
 
           # The Diffblue Cover commands and options to use.
-          # args: >-
-          #   ci
-          #   activate
-          #   build
-          #   validate
-          #   create
+          #args: >-
+          #  ci
+          #  activate
+          #  build
+          #  validate
+          #  create
 
       # Collect Diffblue Cover log files
       - name: Diffblue Artifacts
