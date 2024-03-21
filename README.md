@@ -74,7 +74,7 @@ jobs:
           #  create
 
       # Collect Diffblue Cover outcome files
-      # This job saves Diffblue Cover run outcomes files for later use. These include summary
+      # This step saves Diffblue Cover run outcomes files for later use. These include summary
       # information on Diffblue Cover's results, reports files, and logs. The information
       # contained in these files be used for project analysis, metrics, improving analysis or
       # troubleshooting problems.
