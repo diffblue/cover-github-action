@@ -15,6 +15,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Check - Description Length
+        uses: mikefarah/yq@master
+        with:
+          cmd: yq eval --exit-status '.description | length < 125' action.yml
+
       - name: Build
         run: |
           # Rebuild per-JDK actions based on the base content
