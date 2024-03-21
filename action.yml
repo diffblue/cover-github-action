@@ -1,8 +1,7 @@
 name: Diffblue Cover
 description:
-  Runs Diffblue Cover to automatically write and maintain Java unit tests.
-  Variations of the action are available using various supported JDK versions.
-  This variation uses JDK17.
+  Runs Diffblue Cover directly in your workflow to autonomously write
+  Java unit tests on your pull requests.
 author: Diffblue
 branding:
   icon: check-circle
