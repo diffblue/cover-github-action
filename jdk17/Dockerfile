@@ -1,7 +1,7 @@
 # Default to using the latest version of Diffblue Cover on JDK17
 # Additional images are available for specific Diffblue Cover
 # versions and JDK versions.
-FROM docker.io/diffblue/internal-cover-cli:mn-tg-20846_e145-2024.03.02-snapshot-jdk17
+FROM docker.io/diffblue/internal-cover-cli:mn-tg-21088-2024.03.02-snapshot-jdk17
 
 # Copies your code file from your action repository to the filesystem path `/` of the container
 COPY entrypoint.sh /entrypoint.sh
