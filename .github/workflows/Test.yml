@@ -2,10 +2,6 @@ name: "Test"
 
 on:
   pull_request:
-  push:
-    branches:
-      - main
-      - 'releases/*'
 
 # Avoid running the same workflow on the same branch concurrently
 concurrency:
