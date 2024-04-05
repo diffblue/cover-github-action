@@ -1,4 +1,4 @@
-# Cover GitHub Action
+# Diffblue Cover Pipeline
 
 This project provides a GitHub Action for running Diffblue Cover.
 
@@ -28,7 +28,7 @@ In it's simplest form the "batteries included" action is intended to be used in 
 ```yaml
 name: Example Workflow
 
-# Diffblue Cover CI responds to pull request
+# Diffblue Cover Pipeline responds to pull request events
 on:
   pull_request:
 
