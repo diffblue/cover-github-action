@@ -1,4 +1,4 @@
-name: Diffblue Cover
+name: Diffblue Cover Pipeline
 description:
   Runs Diffblue Cover directly in your workflow to autonomously write
   Java unit tests on your pull requests.
