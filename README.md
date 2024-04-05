@@ -1,11 +1,28 @@
 # Diffblue Cover Pipeline
 
-This project provides a GitHub Action for running Diffblue Cover.
+## Overview
 
+Diffblue Cover Pipeline integrates the power of Diffblue Cover directly into your GitHub Actions workflow to autonomously write and update Java unit tests for your projects on pull requests.
+Diffblue Cover Pipeline enables Java teams using GitHub for their CI pipelines to leverage the power of fully autonomous AI to automate unit test suite generation, maintenance and regression detection for their entire codebase.
+
+The Diffblue Cover Pipeline for GitHub integration is provided in the GitHub Actions marketplace.
+
+## Capabilities
+
+Diffblue Cover creates comprehensive, human-like Java unit tests - saving developer time, increasing test coverage, and reducing regression risks.
+It takes care of the following, automatically:
+
+- Analyzes a codebase and creates a baseline unit test suite
+- Writes new unit tests for new code
+- Updates existing unit tests in your code
+- Removes existing unit tests in your code when they’re no longer required
+
+## Links
+
+- [Documentation](https://docs.diffblue.com/features/cover-pipeline/cover-pipeline-for-github)
 - [Diffblue EULA](https://docs.diffblue.com/legal/diffblue-legal/diffblue-end-user-license-agreement-eula)
 - [Diffblue Privacy Notice](https://docs.diffblue.com/legal/diffblue-legal/privacy-notice)
 - [Request Diffblue trial license](https://www.diffblue.com/try-cover/github)
-- [Documentation](https://docs.diffblue.com/features/cover-pipeline/cover-pipeline-for-github)
 
 ## Variants
 
