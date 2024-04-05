@@ -5,6 +5,7 @@ This project provides a GitHub Action for running Diffblue Cover.
 - [Diffblue EULA](https://docs.diffblue.com/legal/diffblue-legal/diffblue-end-user-license-agreement-eula)
 - [Diffblue Privacy Notice](https://docs.diffblue.com/legal/diffblue-legal/privacy-notice)
 - [Request Diffblue trial license](https://www.diffblue.com/try-cover/github)
+- [Documentation](https://docs.diffblue.com/features/cover-pipeline/cover-pipeline-for-github)
 
 ## Variants
 
