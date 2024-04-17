@@ -1,7 +1,7 @@
 # Default to using the latest version of Diffblue Cover on JDK11
 # Additional images are available for specific Diffblue Cover
 # versions and JDK versions.
-FROM diffblue/cover-cli:2024.04.01-jdk11
+FROM diffblue/cover-cli:2024.04.02-SNAPSHOT-jdk11
 
 # Copies your code file from your action repository to the filesystem path `/` of the container
 COPY entrypoint.sh /entrypoint.sh
