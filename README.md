@@ -40,7 +40,7 @@ Variants are maintained using the `build.sh` script to ensure that they only var
 
 ## Usage
 
-In it's simplest form the "batteries included" action is intended to be used in a workflow to run all things Diffblue Cover:
+In its simplest form the "batteries included" action is intended to be used in a workflow to run all things Diffblue Cover:
 
 ```yaml
 name: Example Workflow
@@ -92,10 +92,10 @@ jobs:
           #  create
 
       # Collect Diffblue Cover outcome files
-      # This step saves Diffblue Cover run outcomes files for later use. These include summary
+      # This step saves Diffblue Cover run outcome files for later use. These include summary
       # information on Diffblue Cover's results, reports files, and logs. The information
-      # contained in these files be used for project analysis, metrics, improving analysis or
-      # troubleshooting problems.
+      # contained in these files can be used for project analysis, metrics, improving analysis
+      # or troubleshooting problems.
       # Note that this job will always run even when the Run Diffblue Cover job fails. This
       # ensures troubleshooting logs and output are available.
       - name: Diffblue Artifacts
