@@ -1,0 +1,24 @@
+name: Create release
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create release
+        if: contains(github.event.head_commit.message, '/release/')
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION_NUMBER=$(echo "${{github.event.head_commit.message}}" | sed -n 's/.*release\/\([0-9]\{4\}\.[0-9]\{2\}\.[0-9]\{2\}\).*/\1/p')
+          if [ -n "$VERSION_NUMBER" ]; then
+            gh release create "v$VERSION_NUMBER" --repo="$GITHUB_REPOSITORY" --title="v$VERSION_NUMBER" --generate-notes
+          else
+            echo "Could not get version number from commit name: ${{github.event.head_commit.message}}"
+            exit 1
+          fi
