@@ -4,10 +4,22 @@ REPO="diffblue/cover-github-action"
 BRANCH_NAME="release/$1"
 PR_TITLE="Release $1"
 PR_BODY="Update Diffblue Cover to $1"
+RELEASE_VERSION=$(echo "$1" | sed -E 's/^([0-9]+\.[0-9]+\.[0-9]+).*$/\1/')
+
+if [[ $1 =~ "-RC" ]]; then
+     echo "Testing release candidate"
+     BRANCH_NAME="testing/$1"
+     PR_TITLE="Testing $1"
+fi
 
 git checkout -b "$BRANCH_NAME"
 
-sed -i "s/cli:[0-9]\{4\}\.[0-9]\{2\}\.[0-9]\{2\}-jdk/cli:$1-jdk/g" Dockerfile
+if [[ $1 =~ "-RC" ]]; then
+     sed -i "s/cli:[0-9]\{4\}\.[0-9]\{2\}\.[0-9]\{2\}-jdk/cli:$RELEASE_VERSION-${1,,}-jdk/g" Dockerfile
+     sed -i "s|diffblue\/cover-cli:|docker.io/diffblue\/internal-cover-cli:release-|g" Dockerfile
+else
+     sed -i "s/cli:[0-9]\{4\}\.[0-9]\{2\}\.[0-9]\{2\}-jdk/cli:$1-jdk/g" Dockerfile
+fi
 
 ./build.sh
 git add Dockerfile
