@@ -6,17 +6,18 @@ PR_TITLE="Release $1"
 PR_BODY="Update Diffblue Cover to $1"
 RELEASE_VERSION=$(echo "$1" | sed -E 's/^([0-9]+\.[0-9]+\.[0-9]+).*$/\1/')
 
-if [[ $1 =~ "-RC" ]]; then
-     echo "Testing release candidate"
+if [ -n "$2" ]; then
+     echo "Testing internal build"
      BRANCH_NAME="testing/$1"
      PR_TITLE="Testing $1"
 fi
 
 git checkout -b "$BRANCH_NAME"
 
-if [[ $1 =~ "-RC" ]]; then
-     sed -i "s/cli:[0-9]\{4\}\.[0-9]\{2\}\.[0-9]\{2\}-jdk/cli:$RELEASE_VERSION-${1,,}-jdk/g" Dockerfile
-     sed -i "s|diffblue\/cover-cli:|docker.io/diffblue\/internal-cover-cli:release-|g" Dockerfile
+if [ -n "$2" ]; then
+     DOCKER_VERSION=$(echo "${2,,}-${1,,}" | sed 's/\//-/g')
+     sed -i "s/cli:[0-9]\{4\}\.[0-9]\{2\}\.[0-9]\{2\}-jdk/cli:$DOCKER_VERSION-jdk/g" Dockerfile
+     sed -i "s|diffblue\/cover-cli:|docker.io/diffblue\/internal-cover-cli:|g" Dockerfile
 else
      sed -i "s/cli:[0-9]\{4\}\.[0-9]\{2\}\.[0-9]\{2\}-jdk/cli:$1-jdk/g" Dockerfile
 fi
