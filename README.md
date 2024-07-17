@@ -1,4 +1,12 @@
-# Diffblue Cover Pipeline
+<h1 align="center">Diffblue Cover Pipeline</h1>
+
+<div align="center">
+
+[![MIT License](https://img.shields.io/github/license/diffblue/cover-github-action)](https://github.com/diffblue/cover-github-action/blob/main/LICENSE)
+[![CI](https://img.shields.io/github/check-runs/diffblue/cover-github-action/main)](https://github.com/diffblue/cover-github-action/actions?query=branch%3Amain)
+[![Latest Release](https://img.shields.io/github/v/release/diffblue/cover-github-action)](https://github.com/diffblue/cover-github-action/releases)
+
+</div>
 
 ## Overview
 
