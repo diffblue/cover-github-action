@@ -1,7 +1,7 @@
 # Default to using the latest version of Diffblue Cover on JDK21
 # Additional images are available for specific Diffblue Cover
 # versions and JDK versions.
-FROM diffblue/cover-cli:2025.02.02-jdk21
+FROM docker.io/diffblue/internal-cover-cli:release-2025.03.01-2025.03.01-rc2-jdk21
 
 # Copies your code file from your action repository to the filesystem path `/` of the container
 COPY entrypoint.sh /entrypoint.sh
