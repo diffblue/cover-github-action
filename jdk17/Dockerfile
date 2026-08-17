@@ -1,7 +1,7 @@
 # Default to using the latest version of Diffblue Cover on JDK17
 # Additional images are available for specific Diffblue Cover
 # versions and JDK versions.
-FROM ghcr.io/diffblue/cover-cli:2026.05.01-jdk17
+FROM ghcr.io/diffblue/cover-cli:2026.08.01-jdk17
 
 # Copies your code file from your action repository to the filesystem path `/` of the container
 COPY entrypoint.sh /entrypoint.sh
